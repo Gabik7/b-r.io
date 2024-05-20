@@ -16,7 +16,6 @@ const nextConfig = {
       "m.media-amazon.com",
       "ik.imagekit.io",
       "miro.medium.com",
-      "img.clerk.com",
       "i.ytimg.com",
       "store.storeimages.cdn-apple.com",
       "www.apple.com",
