@@ -113,7 +113,7 @@ export default function PrivacyPolicy() {
               AGREEMENT IS DEEMED TO HAVE FAILED OF ITS ESSENTIAL PURPOSE. You
               agree to defend, indemnify and hold us harmless from and against
               any and all costs, damages, liabilities, and expenses (including
-              attorneys’ fees, costs, penalties, interest and disbursements) we
+              attorneys fees, costs, penalties, interest and disbursements) we
               incur in relation to, arising from, or for the purpose of
               avoiding, any claim or demand from a third party relating to your
               use of the Service or the use of the Service by any person using

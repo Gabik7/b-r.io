@@ -66,7 +66,7 @@ export default function PrivacyPolicy() {
               style={{ "--index": 1 } as React.CSSProperties}
             >
               A cookie is a string of information that a website stores on a
-              visitor's computer, and that the visitor's browser provides to the
+              visitor&apos;s computer, and that the visitor&apos;s browser provides to the
               website each time the visitor returns. This website identify and
               track visitors, their usage of website, and their website access
               preferences. Visitors who do not wish to have cookies placed on

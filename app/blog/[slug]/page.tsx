@@ -11,8 +11,6 @@ import FlipNumber from "@/app/components/FlipNumber";
 import Me from "@/public/avatar.png";
 
 import { formatDate } from "@/app/_utils/formatDate";
-import { getViewsCount } from "@/app/db/queries";
-import { incrementViews } from "@/app/db/actions";
 import NewsletterSignupForm from "@/app/blog/components/NewsletterSignupForm";
 
 type Props = {
@@ -144,15 +142,10 @@ export default async function Blog({ params }: { params: any }) {
 }
 
 async function Views({ slug }: { slug: string }) {
-  let blogViews = await getViewsCount();
-  const viewsForBlog = blogViews.find((view) => view.slug === slug);
+  // let blogViews = await getViewsCount();
+  // const viewsForBlog = blogViews.find((view) => view.slug === slug);
 
-  incrementViews(slug);
+  // incrementViews(slug);
 
-  return (
-    <span>
-      <FlipNumber>{viewsForBlog?.count || 0}</FlipNumber>
-      {viewsForBlog?.count === 1 ? " view" : " views"}
-    </span>
-  );
+  return <></>;
 }
