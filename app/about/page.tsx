@@ -1,19 +1,20 @@
-import Image from "next/image";
 import { Metadata } from "next";
+import Image from "next/image";
 
-import Link from "@/app/components/ui/Link";
 import Section from "@/app/components/Section";
+import Link from "@/app/components/ui/Link";
 import ConnectLinks from "../components/ConnectLinks";
-import Workplaces from "./components/Workplaces";
 import Gallery from "./components/Gallery";
+import Workplaces from "./components/Workplaces";
 
+import camsLogo from "public/work/cams-logo.png";
 import hinesLogo from "public/work/hines-logo.jpeg";
 import perishipLogo from "public/work/periship-logo.jpeg";
-import camsLogo from "public/work/cams-logo.png";
 import uhdLogo from "public/work/uhd.png";
 
-import meLily from "public/gallery/me-lily.jpg";
+import { notFound } from "next/navigation";
 import colorado from "public/gallery/colorado.jpg";
+import meLily from "public/gallery/me-lily.jpg";
 
 export const metadata: Metadata = {
   title: "About | Brian Ruiz",
@@ -22,6 +23,8 @@ export const metadata: Metadata = {
 };
 
 export default function About() {
+  return notFound();
+
   return (
     <div className="flex flex-col gap-16 md:gap-24">
       <div>
@@ -74,10 +77,10 @@ export default function About() {
         <Section heading="About" headingAlignment="left">
           <div className="flex flex-col gap-6">
             <p>
-              Hi, I&apos;m Brian, born in Honduras and raised in
-              Houston, Texas. I have been coding for{" "}
-              {new Date().getFullYear() - 2019} years. As a software engineer, I
-              specialize in full-stack web development and product design.
+              Hi, I&apos;m Brian, born in Honduras and raised in Houston, Texas.
+              I have been coding for {new Date().getFullYear() - 2019} years. As
+              a software engineer, I specialize in full-stack web development
+              and product design.
             </p>
             <p>
               In addition to coding, I create content on my{" "}

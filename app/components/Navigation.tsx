@@ -11,11 +11,9 @@ import NavLink from "@/app/components/ui/NavLink";
 import ThemeSwitcher from "@/app/components/ThemeSwitcher";
 
 const links = [
-  { label: "About", href: "/about" },
-  { label: "Blog", href: "/blog" },
-  { label: "Craft", href: "/craft"},
-  { label: "Community", href: "/community" },
-  { label: "Gear", href: "/gear" },
+  // { label: "About", href: "/about" },
+  // { label: "My Apps", href: "/projects" },
+  { label: "Support", href: "/support" },
 ];
 
 export default function Navigation() {
@@ -25,7 +23,8 @@ export default function Navigation() {
     <header className="md:mt-6">
       <nav className="mx-auto flex max-w-[700px] items-center justify-between gap-3 px-4 py-3 md:px-6">
         <Link href="/" className="shrink-0 text-primary">
-          <svg
+          GFCodes
+          {/* <svg
             xmlns="http://www.w3.org/2000/svg"
             width="36"
             height="36"
@@ -45,7 +44,7 @@ export default function Navigation() {
                 />
               </g>
             </g>
-          </svg>
+          </svg> */}
         </Link>
         <ul className="hidden items-center gap-1 md:flex">
           {links.map((link) => (

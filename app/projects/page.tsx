@@ -1,9 +1,10 @@
+import { allProjects } from ".contentlayer/generated";
+import Halo from "@/app/components/ui/Halo";
+import clsx from "clsx";
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import clsx from "clsx";
-import { allProjects, Project } from ".contentlayer/generated";
-import Halo from "@/app/components/ui/Halo";
+import { notFound } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Projects | Brian Ruiz",
@@ -12,6 +13,8 @@ export const metadata: Metadata = {
 
 export default function Blog() {
   const projects = allProjects;
+
+  return notFound();
 
   return (
     <div className="mx-auto max-w-[700px]">
@@ -64,9 +67,7 @@ export default function Blog() {
                   <time className="text-secondary"> · {project.time}</time>
                 </div>
 
-                <p className="line-clamp-3 text-tertiary">
-                  {project.summary}
-                </p>
+                <p className="line-clamp-3 text-tertiary">{project.summary}</p>
               </div>
             </li>
           ))}

@@ -1,8 +1,9 @@
-import { Metadata } from "next";
 import { allCrafts } from ".contentlayer/generated";
+import { Metadata } from "next";
 
-import Link from "@/app/components/ui/Link";
 import Section from "@/app/components/Section";
+import Link from "@/app/components/ui/Link";
+import { notFound } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Craft | Brian Ruiz",
@@ -24,6 +25,8 @@ export default function CraftPage() {
       new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
   );
 
+  return notFound();
+
   return (
     <div className="flex flex-col gap-16 md:gap-24">
       <div className="flex flex-col gap-8">
@@ -37,14 +40,14 @@ export default function CraftPage() {
           >
             My UI sandbox.
           </p>
-          
         </div>
         <p
-            className="max-w-lg animate-in text-tertiary"
-            style={{ "--index": 1 } as React.CSSProperties}
-          >
-            This is a collection of UI components and designs I&apos;ve created. And really my breakable toy where I can experiment with new things.
-          </p>
+          className="max-w-lg animate-in text-tertiary"
+          style={{ "--index": 1 } as React.CSSProperties}
+        >
+          This is a collection of UI components and designs I&apos;ve created.
+          And really my breakable toy where I can experiment with new things.
+        </p>
       </div>
       <ul
         className="animated-list flex animate-in flex-col"

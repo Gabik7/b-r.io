@@ -1,11 +1,12 @@
-import Image from "next/image";
 import type { Metadata } from "next";
+import Image from "next/image";
 
 import avatar from "public/avatar.png";
 import map from "public/map.png";
 import { FaYoutube } from "react-icons/fa";
 
 import Link from "@/app/components/ui/Link";
+import { notFound } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Mediakit | Brian Ruiz",
@@ -15,14 +16,11 @@ export const metadata: Metadata = {
 
 // get youtube subs count from route handler api/youtube
 async function getData() {
-  const res = await fetch(
-    `https://b-r.io/api/youtube`,
-    {
-      next: {
-        revalidate: 86400, // 24 hours
-      },
+  const res = await fetch(`https://b-r.io/api/youtube`, {
+    next: {
+      revalidate: 86400, // 24 hours
     },
-  );
+  });
   if (!res.ok) {
     // This will activate the closest `error.js` Error Boundary
     throw new Error("Failed to fetch data");
@@ -33,6 +31,8 @@ async function getData() {
 
 export default async function Mediakit() {
   const data = await getData();
+
+  return notFound();
 
   return (
     <div className="relative">

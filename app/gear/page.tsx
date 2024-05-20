@@ -1,14 +1,15 @@
-import Image, { StaticImageData } from "next/image";
 import { Metadata } from "next";
+import Image, { StaticImageData } from "next/image";
 
-import Copilot from "public/gear/copilot.jpeg";
-import Superhuman from "public/gear/superhuman.png";
-import Sway from "public/gear/sway.png";
-import shelf from "public/gear/shelf.png";
+import { notFound } from "next/navigation";
 import cables from "public/gear/cables.png";
+import Copilot from "public/gear/copilot.jpeg";
 import EpidemicSound from "public/gear/epidemic-sound.png";
 import Keyboard from "public/gear/keeb.jpeg";
 import Macrofactor from "public/gear/macrofactor.webp";
+import shelf from "public/gear/shelf.png";
+import Superhuman from "public/gear/superhuman.png";
+import Sway from "public/gear/sway.png";
 
 export const metadata: Metadata = {
   title: "Gear | Brian Ruiz",
@@ -33,7 +34,7 @@ interface ItemProps {
 const Item = ({ title, description, image, link, sponsored }: ItemProps) => (
   <li className="flex items-center gap-4 transition-opacity">
     <a
-      className="relative aspect-square h-[4rem] w-[4rem] min-w-[4rem] overflow-hidden rounded-xl bg-tertiary shadow-sm border border-secondary"
+      className="relative aspect-square h-[4rem] w-[4rem] min-w-[4rem] overflow-hidden rounded-xl border border-secondary bg-tertiary shadow-sm"
       href={link}
       target="_blank"
     >
@@ -78,6 +79,8 @@ export default function Gear() {
   }, [] as string[]);
 
   categories.sort();
+
+  return notFound();
 
   return (
     <>
@@ -226,7 +229,8 @@ const gear = [
   {
     name: "MacroFactor",
     category: "Apps",
-    description: "code 'brianruiz' for extended trial. I use this to stay on top of my diet.",
+    description:
+      "code 'brianruiz' for extended trial. I use this to stay on top of my diet.",
     image: Macrofactor,
     link: "https://macrofactorapp.com/",
   },

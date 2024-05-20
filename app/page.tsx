@@ -1,11 +1,5 @@
-import Image from "next/image";
 import { allBlogs } from ".contentlayer/generated";
-import { ArrowUpRightIcon } from "@heroicons/react/20/solid";
 
-import Link from "@/app/components/ui/Link";
-import PostList from "@/app/blog/components/PostList";
-import BentoGrid from "@/app/components/bento/BentoGrid";
-import Me from "@/public/avatar.png";
 import Avatar from "@/app/components/ui/Avatar";
 
 export default function Home() {
@@ -24,29 +18,30 @@ export default function Home() {
           className="animate-in"
           style={{ "--index": 1 } as React.CSSProperties}
         >
-          <Avatar src={Me} alt="Brian Ruiz" initials="br" size="lg" />
+          <Avatar alt="Gabriel Falis" initials="gf" size="lg" />
         </div>
         <div
           className="animate-in space-y-4"
           style={{ "--index": 2 } as React.CSSProperties}
         >
           <h1 className="text-3xl font-bold tracking-tight text-primary">
-            Brian Ruiz
+            Gabriel Falis
           </h1>
           <p className="max-w-lg text-secondary">
-            Hi there, I&apos;m a software engineer who builds for the web with a
-            design-oriented approach. In addition to coding, I also make YouTube
-            videos, where I focus on tech, and productivity.
+            Hello, my name is Gabriel Falis. I’m a full stack developer and
+            primarily a mobile app developer based in Europe, Slovakia. I run my
+            own development studio to build mobile apps that I’d like to use and
+            help create quality apps for startups and businesses.
           </p>
         </div>
       </div>
-      <div
+      {/* <div
         className="animate-in"
         style={{ "--index": 3 } as React.CSSProperties}
       >
         <BentoGrid />
-      </div>
-      <div
+      </div> */}
+      {/* <div
         className="flex animate-in flex-col gap-8"
         style={{ "--index": 4 } as React.CSSProperties}
       >
@@ -64,7 +59,7 @@ export default function Home() {
           </p>
         </div>
         <PostList posts={blogs} />
-      </div>
+      </div> */}
     </div>
   );
 }

@@ -1,7 +1,8 @@
-import { Metadata } from "next";
 import { allBlogs } from ".contentlayer/generated";
-import PostList from "./components/PostList";
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
 import NewsletterSignupForm from "./components/NewsletterSignupForm";
+import PostList from "./components/PostList";
 
 export const metadata: Metadata = {
   title: "Blog | Brian Ruiz",
@@ -22,6 +23,8 @@ export default function BlogPage() {
     (a, b) =>
       new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
   );
+
+  return notFound();
 
   return (
     <div className="flex flex-col gap-16 md:gap-24">
