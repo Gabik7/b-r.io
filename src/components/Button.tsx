@@ -27,7 +27,7 @@ export function Button({
   return typeof props.href === 'undefined' ? (
     <button
       className={cn(
-        'inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium outline-offset-2 transition-all active:not-aria-[haspopup]:translate-y-px',
+        'inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium outline-offset-2 transition-[background-color,border-color,color,transform] active:not-aria-[haspopup]:translate-y-px',
         variantStyles[variant],
         className,
       )}
@@ -36,7 +36,7 @@ export function Button({
   ) : (
     <Link
       className={cn(
-        'inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium outline-offset-2 transition-all active:not-aria-[haspopup]:translate-y-px',
+        'inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium outline-offset-2 transition-[background-color,border-color,color,transform] active:not-aria-[haspopup]:translate-y-px',
         variantStyles[variant],
         className,
       )}

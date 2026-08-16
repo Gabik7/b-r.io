@@ -1,53 +1,60 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
-import { ArrowUpRightIcon } from '@heroicons/react/24/outline'
 
+import { ProjectArtwork } from '@/components/ProjectArtwork'
+import { ProjectLinks } from '@/components/ProjectLinks'
 import { projects } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Projects',
-  description: 'Selected web and mobile projects by Gabriel Falis.',
+  description:
+    'ServiceBook, ENSELORA, and Setlyvo — iOS and web products by Gabriel Falis.',
 }
 
 export default function ProjectsPage() {
   return (
-    <div className="px-4 pt-36 pb-32 sm:px-6 sm:pt-44 md:pb-48">
-      <header className="mx-auto max-w-7xl">
-        <p className="text-sm font-medium text-ink/50">Selected work</p>
-        <h1 className="mt-6 max-w-5xl text-[clamp(3.6rem,8vw,8rem)] leading-[0.9] font-medium tracking-[-0.055em]">
-          Products built with purpose.
+    <div className="px-4 pt-36 pb-28 sm:px-6 sm:pt-44 md:pb-40">
+      <header className="mx-auto grid max-w-7xl gap-10 border-b border-ink/12 pb-14 lg:grid-cols-[minmax(0,1fr)_25rem] lg:items-end">
+        <h1 className="max-w-5xl text-[clamp(3.8rem,9vw,8.8rem)] leading-[0.86] font-medium tracking-[-0.06em] text-balance">
+          Products in the real world.
         </h1>
-        <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink/60">
-          A small collection of native iOS experiments and independent product
-          work. More releases will be added as they reach the App Store.
+        <p className="max-w-xl text-lg leading-relaxed text-ink/62">
+          Released work and products still being shaped. Status and download
+          links stay explicit, so a concept never pretends to be a launch.
         </p>
       </header>
 
-      <div className="mx-auto mt-24 max-w-7xl space-y-5">
+      <div className="mx-auto max-w-7xl">
         {projects.map((project, index) => (
-          <Link
+          <article
             key={project.name}
-            href={project.href}
-            className={`tone-${project.tone} group grid min-h-72 overflow-hidden rounded-[2rem] p-7 transition-transform duration-500 hover:-translate-y-1 sm:p-10 md:grid-cols-[0.18fr_0.32fr_0.5fr] md:items-end`}
+            className="project-row grid gap-10 py-14 md:grid-cols-[minmax(16rem,0.84fr)_minmax(0,1.16fr)] md:items-center md:gap-16 lg:py-20"
           >
-            <span className="text-sm font-medium text-ink/45">
-              0{index + 1}
-            </span>
-            <div className="mt-12 md:mt-0">
-              <p className="text-sm font-medium text-ink/55">{project.type}</p>
-              <h2 className="mt-3 text-4xl font-medium tracking-[-0.04em] sm:text-5xl">
+            <ProjectArtwork project={project} priority={index === 0} />
+            <div>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+                <span className="font-medium">{project.status}</span>
+                <span className="text-ink/35" aria-hidden="true">
+                  /
+                </span>
+                <span className="text-ink/52">{project.year}</span>
+              </div>
+              <h2 className="mt-5 text-[clamp(3rem,6vw,6rem)] leading-[0.94] font-medium tracking-[-0.05em]">
                 {project.name}
               </h2>
-            </div>
-            <div className="mt-8 flex items-end justify-between gap-8 md:mt-0">
-              <p className="max-w-lg text-lg leading-relaxed text-ink/65">
+              <p className="mt-3 text-sm font-medium text-ink/48">
+                {project.label}
+              </p>
+              <p className="mt-7 max-w-2xl text-xl leading-relaxed text-ink/68">
                 {project.description}
               </p>
-              <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-white/55 transition-transform duration-500 group-hover:rotate-45">
-                <ArrowUpRightIcon className="size-5" />
-              </span>
+              <p className="mt-5 max-w-2xl leading-relaxed text-ink/55">
+                {project.detail}
+              </p>
+              <div className="mt-9">
+                <ProjectLinks project={project} />
+              </div>
             </div>
-          </Link>
+          </article>
         ))}
       </div>
     </div>

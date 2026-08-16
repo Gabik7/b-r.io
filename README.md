@@ -5,7 +5,7 @@ Personal portfolio and App Store support site for Gabriel Falis.
 ## Included pages
 
 - Portfolio homepage
-- Projects
+- Projects: ServiceBook, ENSELORA, and Setlyvo
 - App support
 - Privacy Policy
 - Terms of Service
@@ -14,7 +14,6 @@ Personal portfolio and App Store support site for Gabriel Falis.
 
 - Next.js App Router and TypeScript
 - Tailwind CSS
-- GSAP with ScrollTrigger
 - Locally hosted Cabinet Grotesk
 
 ## Local development
@@ -29,6 +28,10 @@ local and hosted environments.
 
 Set `NEXT_PUBLIC_SITE_URL` to the production URL before deployment so metadata,
 robots, and the sitemap use the correct domain.
+
+ServiceBook links to its live App Store listing. ENSELORA and Setlyvo are marked
+as pre-release products until their public listings exist; add those URLs in
+`src/lib/site.ts` after launch.
 
 ## Before publishing
 

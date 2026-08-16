@@ -16,15 +16,15 @@ export function Header() {
   const pathname = usePathname()
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6">
-      <div className="nav-surface mx-auto flex max-w-7xl items-center justify-between rounded-2xl px-4 py-3 sm:px-5">
+    <header className="site-header fixed inset-x-0 top-0 z-50 border-b border-ink/10 bg-paper px-4 sm:px-6">
+      <div className="mx-auto flex min-h-20 max-w-7xl items-center justify-between">
         <Link
           href="/"
           aria-label="Gabriel — home"
-          className="group flex items-center gap-3 font-medium tracking-tight"
+          className="group flex min-h-11 items-center gap-3 font-medium tracking-tight"
           onClick={() => setOpen(false)}
         >
-          <span className="flex size-9 items-center justify-center rounded-xl bg-ink text-sm font-bold text-paper transition-transform duration-300 group-hover:-rotate-3">
+          <span className="flex size-9 items-center justify-center rounded-lg bg-ink text-sm font-bold text-paper">
             GF
           </span>
           <span>Gabriel</span>
@@ -32,24 +32,32 @@ export function Header() {
 
         <nav aria-label="Main navigation" className="hidden md:block">
           <ul className="flex items-center gap-1 text-sm font-medium">
-            {navigation.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className={`rounded-xl px-4 py-2.5 transition-colors hover:bg-ink/5 ${
-                    pathname === item.href ? 'bg-ink/5' : ''
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
+            {navigation.map((item) => {
+              const active =
+                item.href === '/#about'
+                  ? pathname === '/'
+                  : pathname === item.href
+
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    aria-current={active ? 'page' : undefined}
+                    className={`flex min-h-11 items-center border-b border-transparent px-4 text-sm transition-colors hover:border-ink/35 ${
+                      active ? 'border-ink' : ''
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              )
+            })}
           </ul>
         </nav>
 
         <Link
           href="mailto:falis.gabriel@gmail.com"
-          className="hidden rounded-xl bg-ink px-4 py-2.5 text-sm font-medium text-paper transition-transform hover:-translate-y-0.5 md:block"
+          className="button-primary hidden md:inline-flex"
         >
           Let&apos;s talk
         </Link>
@@ -58,7 +66,7 @@ export function Header() {
           type="button"
           aria-label={open ? 'Close menu' : 'Open menu'}
           aria-expanded={open}
-          className="rounded-xl border border-ink/10 p-2 md:hidden"
+          className="flex size-11 items-center justify-center border border-ink/12 md:hidden"
           onClick={() => setOpen((value) => !value)}
         >
           {open ? (
@@ -72,14 +80,14 @@ export function Header() {
       {open ? (
         <nav
           aria-label="Mobile navigation"
-          className="nav-surface mx-auto mt-2 max-w-7xl rounded-2xl p-3 md:hidden"
+          className="absolute inset-x-0 top-full border-b border-ink/10 bg-paper p-4 md:hidden"
         >
           <ul className="space-y-1 text-base font-medium">
             {navigation.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="block rounded-xl px-4 py-3 hover:bg-ink/5"
+                  className="flex min-h-12 items-center border-b border-ink/10 px-1"
                   onClick={() => setOpen(false)}
                 >
                   {item.label}
@@ -89,7 +97,7 @@ export function Header() {
             <li>
               <Link
                 href="mailto:falis.gabriel@gmail.com"
-                className="mt-2 block rounded-xl bg-ink px-4 py-3 text-paper"
+                className="mt-3 flex min-h-12 items-center justify-center bg-ink px-4 text-paper"
                 onClick={() => setOpen(false)}
               >
                 Let&apos;s talk
