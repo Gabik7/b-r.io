@@ -2,13 +2,19 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRightIcon, ArrowUpRightIcon } from '@heroicons/react/24/outline'
 
+import { createPageMetadata } from '@/lib/metadata'
 import { projects, site } from '@/lib/site'
 
-export const metadata: Metadata = {
-  title: 'App Support',
-  description:
-    'Direct support for ServiceBook, ENSELORA, Setlyvo, and other apps published by Gabriel Falis.',
-}
+const title = 'App Support for ENSELORA, Setlyvo & ServiceBook'
+const description =
+  'Contact Gabriel Falis for ENSELORA, Setlyvo, and ServiceBook support, subscriptions, privacy requests, account deletion, and technical issues.'
+
+export const metadata: Metadata = createPageMetadata({
+  title,
+  description,
+  path: '/support',
+  heroTitle: 'Direct support for apps by Gabriel Falis.',
+})
 
 const topics = [
   {
@@ -66,7 +72,8 @@ export default function SupportPage() {
             {projects.map((project) => (
               <li
                 key={project.name}
-                className="grid gap-4 py-6 sm:grid-cols-[1fr_auto] sm:items-center"
+                id={project.artwork}
+                className="grid scroll-mt-24 gap-4 py-6 sm:grid-cols-[1fr_auto] sm:items-center"
               >
                 <div>
                   <p className="text-2xl font-medium tracking-[-0.025em]">

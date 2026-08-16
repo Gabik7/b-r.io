@@ -4,7 +4,13 @@ import { ogSize } from '@/lib/og'
 import { homeHeroTitle } from '@/lib/site-copy'
 
 export function getSiteUrl() {
-  return process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+  const vercelUrl =
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL
+  const configuredUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    (vercelUrl ? `https://${vercelUrl}` : 'http://localhost:3000')
+
+  return configuredUrl.replace(/\/$/, '')
 }
 
 export function createOgImageUrl(title: string) {
@@ -49,25 +55,37 @@ export function createTwitterMetadata(
 export function createPageMetadata({
   title,
   description,
+  path,
+  socialTitle,
   heroTitle,
 }: {
-  title: string
+  title: Metadata['title']
   description: string
+  path: `/${string}` | '/'
+  socialTitle?: string
   heroTitle?: string
 }): Metadata {
-  const imageTitle = heroTitle ?? title
+  const resolvedSocialTitle =
+    socialTitle ?? (typeof title === 'string' ? title : 'Gabriel Falis')
+  const imageTitle = heroTitle ?? resolvedSocialTitle
 
   return {
     title,
     description,
+    alternates: { canonical: path },
     openGraph: {
-      title,
+      title: resolvedSocialTitle,
       description,
       type: 'website',
+      url: path,
       images: createOpenGraphImages(imageTitle),
     },
     twitter: {
-      ...createTwitterMetadata(title, createOgImageUrl(imageTitle)),
+      ...createTwitterMetadata(
+        resolvedSocialTitle,
+        createOgImageUrl(imageTitle),
+      ),
+      title: resolvedSocialTitle,
       description,
     },
   }

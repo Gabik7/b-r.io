@@ -15,7 +15,7 @@ type HaloProps = {
 }
 
 /**
- * Mouse-following spotlight, ported from b-r.io.
+ * Mouse-following spotlight for the portfolio hero.
  * Opacity is driven by a parent `group-hover:` so it still works when the
  * card’s stretched link sits above this surface.
  */

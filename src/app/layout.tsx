@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
 
 import { Layout } from '@/components/Layout'
+import { getSiteUrl } from '@/lib/metadata'
 
 import '@/styles/tailwind.css'
 
@@ -15,7 +16,7 @@ const cabinet = localFont({
   display: 'swap',
 })
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+const siteUrl = getSiteUrl()
 const metadataBase = (() => {
   try {
     return new URL(siteUrl)
@@ -23,19 +24,41 @@ const metadataBase = (() => {
     return new URL('http://localhost:3000')
   }
 })()
-const title = 'Gabriel Falis — Web & Mobile App Developer'
+const title = 'Gabriel Falis | iOS & Web App Developer'
 const description =
-  'Independent developer from Slovakia building thoughtful web and Apple-platform products.'
+  'Independent iOS and web developer from Slovakia building ServiceBook, ENSELORA, and Setlyvo.'
 
 export const metadata: Metadata = {
   metadataBase,
   title: { default: title, template: '%s — Gabriel Falis' },
   description,
-  alternates: { canonical: '/' },
+  applicationName: 'Gabriel Falis',
+  authors: [{ name: 'Gabriel Falis', url: '/' }],
+  creator: 'Gabriel Falis',
+  publisher: 'Gabriel Falis',
+  category: 'technology',
+  keywords: [
+    'Gabriel Falis',
+    'iOS developer Slovakia',
+    'SwiftUI developer',
+    'ENSELORA',
+    'ServiceBook',
+    'Setlyvo',
+  ],
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
   openGraph: {
     title,
     description,
-    url: '/',
     siteName: 'Gabriel Falis',
     locale: 'en_US',
     type: 'website',

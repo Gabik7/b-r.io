@@ -1,158 +1,254 @@
 import type { Metadata } from 'next'
 
 import { LegalPage } from '@/components/LegalPage'
+import { createPageMetadata } from '@/lib/metadata'
 
-export const metadata: Metadata = {
-  title: 'Privacy Policy',
-  description:
-    'Privacy policy for apps and services published by Gabriel Falis.',
-}
+const title = 'Privacy Policy for ENSELORA & Gabriel Falis Apps'
+const description =
+  'Privacy policy for ENSELORA and other apps by Gabriel Falis, covering local data, photos, optional AI, cloud sync, subscriptions, analytics, and deletion.'
+
+export const metadata: Metadata = createPageMetadata({
+  title,
+  description,
+  path: '/privacy',
+  heroTitle: 'Privacy for ENSELORA and apps by Gabriel Falis.',
+})
 
 export default function PrivacyPage() {
   return (
     <LegalPage
       title="Privacy Policy"
-      intro="This policy explains how information is handled by mobile applications, websites, and related services published by Gabriel Falis that link to this page."
+      intro="One policy for apps and related services published by Gabriel Falis. Product-specific details below explain how ENSELORA works without requiring a separate legal website or domain."
     >
       <section>
-        <h2>1. Scope</h2>
+        <h2>1. Scope and covered products</h2>
         <p>
-          This Privacy Policy applies to products published by Gabriel Falis
-          that link to it. If an individual product provides an additional
-          privacy notice, that notice supplements this policy and describes any
-          product-specific data practices.
+          This Privacy Policy applies to mobile apps, websites, support
+          channels, and related services published by Gabriel Falis that link to
+          this page. It currently provides product-specific disclosures for
+          ENSELORA. New products may be added here before they launch.
+        </p>
+        <p>
+          ServiceBook maintains its own product website and privacy information.
+          Where an app-specific section conflicts with the general part of this
+          policy, the more specific disclosure applies to that app.
         </p>
       </section>
 
       <section>
-        <h2>2. Information that may be processed</h2>
+        <h2>2. Data controller and contact</h2>
+        <p>
+          The controller for products covered by this policy is Gabriel Falis,
+          Slovakia. Privacy questions and requests can be sent to{' '}
+          <a href="mailto:falis.gabriel@gmail.com?subject=Privacy%20request">
+            falis.gabriel@gmail.com
+          </a>
+          .
+        </p>
+        <p>
+          When making a request, include the app name and enough information to
+          identify the relevant account or support conversation. Do not send a
+          password or full payment-card information.
+        </p>
+      </section>
+
+      <section>
+        <h2>3. General data practices</h2>
         <h3>Information you provide</h3>
         <p>
-          When you contact support, I may receive your email address, the
-          content of your message, attachments you choose to send, and technical
-          details you include about the app or device.
+          Depending on the product, this may include account information,
+          content you create or upload, preferences, feedback, and support
+          messages. Each app should request only the information required for a
+          feature you choose to use.
         </p>
-        <h3>App and device information</h3>
+        <h3>Technical and purchase information</h3>
         <p>
-          Depending on the features of a particular app, limited technical data
-          such as app version, device type, operating-system version,
-          diagnostics, or crash information may be processed to operate and
-          improve the app. The App Store privacy information for each app
-          describes the data used by that app and by any third-party SDKs
-          included in it.
+          A product may process app version, device and operating-system
+          details, request identifiers, subscription status, diagnostics, or
+          security events needed to operate, protect, and troubleshoot the
+          service. Apple processes App Store payments; Gabriel Falis does not
+          receive full payment-card details.
         </p>
-        <h3>Purchases</h3>
+        <h3>Purposes and legal bases</h3>
         <p>
-          App Store purchases are processed by Apple. I do not receive or store
-          your full payment-card details. I may receive transaction status or a
-          purchase identifier when needed to provide purchased functionality or
-          support.
+          Information is used to provide requested features and purchases,
+          maintain security, answer support, comply with legal obligations, and
+          improve a product where consent or another applicable legal basis
+          permits it. Personal information is not sold and is not used for
+          cross-app advertising tracking.
         </p>
       </section>
 
-      <section>
-        <h2>3. How information is used</h2>
+      <section id="enselora" className="scroll-mt-24">
+        <h2>4. ENSELORA privacy details</h2>
+        <h3>Data processed by ENSELORA</h3>
+        <p>Depending on the features you use, ENSELORA may process:</p>
         <ul>
           <li>
-            To provide, maintain, secure, and improve the relevant product.
+            profile preferences such as name, style, occasions, and reminder
+            time;
           </li>
-          <li>To answer support requests and troubleshoot reported issues.</li>
-          <li>To provide features you request and verify purchases.</li>
-          <li>To comply with legal obligations and prevent misuse.</li>
+          <li>
+            clothing photos, originals, local previews, masks, and wardrobe-item
+            descriptions;
+          </li>
+          <li>
+            saved outfits, wear history, travel plans, favourites, and feedback;
+          </li>
+          <li>
+            for an optional account, an internal identifier and the email
+            address hidden or provided through Sign in with Apple;
+          </li>
+          <li>
+            approximate location after optional permission, used for local
+            weather through Apple WeatherKit;
+          </li>
+          <li>
+            optionally selected calendar event titles, processed on device to
+            infer the type of activity and not stored by ENSELORA;
+          </li>
+          <li>
+            technical subscription, quota, security, analytics, or crash data as
+            described below; and
+          </li>
+          <li>information you choose to send to support.</li>
         </ul>
+
+        <h3>Local data, optional account, and cloud sync</h3>
         <p>
-          Personal information is not sold. It is not used for cross-app
-          tracking or targeted advertising unless an individual app clearly
-          discloses that practice and obtains any consent required by law and
-          Apple policy.
+          Without signing in, the wardrobe, profile, photos, outfits, and
+          history remain stored locally in the iPhone app. Try-On history,
+          including the person photo and result, remains local and is not
+          synced.
+        </p>
+        <p>
+          Optional Sign in with Apple creates an account through Supabase Auth.
+          If an eligible ENSELORA+ user enables sync, profile, wardrobe, outfit,
+          wear-history and travel-plan records, plus clothing photos, are stored
+          in a private Supabase database and storage bucket. Access rules
+          restrict an account to its own records and files. Changes are saved
+          locally before transfer over HTTPS.
+        </p>
+
+        <h3>AI and image processing</h3>
+        <p>
+          Basic foreground separation may run on the iPhone through Apple
+          Vision. If you choose remote clothing recognition, fallback background
+          removal, outfit generation, or virtual Try-On, the information
+          required for that request is sent through the ENSELORA service after
+          the relevant consent. Google Gemini may process clothing recognition
+          and outfit composition. Replicate may process fallback background
+          removal through 851 Labs and virtual Try-On through Pruna. Try-On may
+          include a full-body photo and photos of selected clothes.
+        </p>
+        <p>
+          Submitted photos are not used by Gabriel Falis for advertising or to
+          train a proprietary model. ENSELORA does not create a permanent server
+          photo archive or intentionally log photo content. Technical request
+          caches expire within 15 minutes. Pseudonymous daily or monthly quota
+          counters expire within 32 days. External providers process requests
+          under their own terms, retention rules, and data-processing
+          safeguards.
+        </p>
+
+        <h3>Weather, location, and calendar</h3>
+        <p>
+          Location is optional. If allowed, approximate location is used with
+          Apple WeatherKit to retrieve local weather. The latest coordinates and
+          weather response are kept only in a daily cache on the device.
+          Location is not used for advertising or cross-app tracking. Optional
+          calendar event titles are processed on device and are not stored by
+          ENSELORA.
+        </p>
+
+        <h3>Subscriptions</h3>
+        <p>
+          Apple processes purchases through the App Store. RevenueCat helps
+          verify subscription status and may process a pseudonymous app-user
+          identifier, product, transaction, and entitlement information.
+          ENSELORA does not receive the full payment-card number.
+        </p>
+
+        <h3>Optional analytics and diagnostics</h3>
+        <p>
+          PostHog product analytics and Sentry crash diagnostics are separate,
+          off-by-default choices. After consent, ENSELORA sends only predefined
+          feature events or technical diagnostics needed to understand use and
+          investigate failures. It does not send wardrobe photos, clothing
+          names, outfit text, or the account email. Session replay, automatic
+          screen capture, and cross-app tracking are not used. Consent can be
+          withdrawn in the app under Account &amp; Sync.
         </p>
       </section>
 
       <section>
-        <h2>4. Sharing and service providers</h2>
+        <h2>5. Service providers and transfers</h2>
         <p>
-          Information may be processed by service providers only when necessary
-          to deliver an app feature, host a service, process a purchase,
-          diagnose a failure, or respond to support. These providers are
-          expected to protect information consistently with this policy and
-          applicable law. Apple independently processes information under its
-          own privacy policy when you use the App Store, iCloud, StoreKit, or
-          other Apple services.
+          Depending on the selected ENSELORA feature, service providers may
+          include Apple, Supabase, Google Gemini, Replicate and its named model
+          providers, RevenueCat, Upstash, PostHog, Sentry, Vercel, and Resend.
+          They process information only for the relevant hosting, account,
+          purchase, AI, rate-limiting, analytics, diagnostics, or support
+          purpose.
         </p>
         <p>
-          Information may also be disclosed where required by law, to protect
-          users or the public, or in connection with a business transfer subject
-          to appropriate safeguards.
-        </p>
-      </section>
-
-      <section>
-        <h2>5. Device permissions and consent</h2>
-        <p>
-          An app will request access to device features such as photos,
-          notifications, camera, microphone, or location only when a feature
-          needs that access. You can deny or revoke permissions in your device
-          settings. Some features may not work without the relevant permission.
+          Providers may process information outside the European Economic Area.
+          Where required, transfers rely on an adequacy decision, Standard
+          Contractual Clauses, or another lawful safeguard. Apple independently
+          processes information under its own privacy policy when you use the
+          App Store, Sign in with Apple, WeatherKit, or other Apple services.
         </p>
       </section>
 
       <section>
         <h2>6. Retention and deletion</h2>
         <p>
-          Information is retained only for as long as needed for the purpose for
-          which it was processed, to meet legal obligations, or to resolve
-          disputes. Support correspondence is generally deleted or anonymized
-          when it is no longer reasonably needed. You may request deletion of
-          personal information by emailing the address below. Some records may
-          be retained where required by law or for legitimate security purposes.
+          Local app information remains until you delete it in the app, remove
+          the app, or erase the device, subject to device backups you control.
+          Optional cloud data remains while the account is active and is removed
+          when the in-app cloud-account deletion completes, except for records
+          that must be retained for security, fraud prevention, or legal
+          compliance.
+        </p>
+        <p>
+          ENSELORA support correspondence is retained for no longer than 12
+          months unless a longer period is reasonably needed to resolve the
+          request or required by law. Temporary AI request and quota records use
+          the shorter periods stated in the ENSELORA section above.
         </p>
       </section>
 
       <section>
-        <h2>7. Your rights</h2>
+        <h2>7. Your controls and rights</h2>
         <p>
-          Depending on where you live, you may have rights to access, correct,
-          delete, restrict, or receive a copy of your personal information, and
-          to object to or withdraw consent for certain processing. To make a
-          request, email{' '}
-          <a href="mailto:falis.gabriel@gmail.com?subject=Privacy%20request">
-            falis.gabriel@gmail.com
-          </a>
-          . You may also have the right to contact your local data-protection
-          authority.
+          ENSELORA provides controls to export app data, delete local data,
+          withdraw optional analytics or diagnostics consent, sign out, and
+          delete an optional cloud account. Deleting the cloud account removes
+          its cloud records and cloud clothing photos; local data can be deleted
+          separately.
+        </p>
+        <p>
+          Depending on applicable law, you may request access, correction,
+          deletion, restriction, portability, or object to processing. You may
+          withdraw consent at any time without affecting processing that was
+          lawful before withdrawal. You may also complain to your local data
+          protection authority, including the Office for Personal Data
+          Protection of the Slovak Republic where applicable.
         </p>
       </section>
 
       <section>
-        <h2>8. Children</h2>
+        <h2>8. Children, security, and changes</h2>
         <p>
-          Products are not directed to children under 13 unless an individual
-          app states otherwise and includes appropriate safeguards. If you
-          believe a child has provided personal information, please contact me
-          so it can be reviewed and deleted where appropriate.
-        </p>
-      </section>
-
-      <section>
-        <h2>9. Security and international processing</h2>
-        <p>
-          Reasonable technical and organizational measures are used to protect
-          information. No system is completely secure. Service providers may
-          process information in countries other than your own, with safeguards
-          required by applicable law.
-        </p>
-      </section>
-
-      <section>
-        <h2>10. Changes and contact</h2>
-        <p>
-          This policy may be updated as products or legal requirements change.
-          The effective date above will be revised when material updates are
-          published.
+          Covered products are not directed to children under 13 unless an
+          individual product says otherwise and provides appropriate safeguards.
+          Reasonable technical and organisational measures are used to protect
+          information, but no system can guarantee absolute security.
         </p>
         <p>
-          Questions or requests can be sent to Gabriel Falis at{' '}
-          <a href="mailto:falis.gabriel@gmail.com">falis.gabriel@gmail.com</a>.
+          This policy may be updated when products, providers, or legal
+          requirements change. The effective date will be revised, and material
+          changes will be communicated in the app where appropriate.
         </p>
       </section>
     </LegalPage>

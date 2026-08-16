@@ -4,6 +4,8 @@ import { ArrowUpRightIcon } from '@heroicons/react/24/outline'
 import type { Project } from '@/lib/site'
 
 export function ProjectLinks({ project }: { project: Project }) {
+  const websiteIsExternal = project.websiteHref?.startsWith('http')
+
   return (
     <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
       {project.appStoreHref ? (
@@ -26,10 +28,10 @@ export function ProjectLinks({ project }: { project: Project }) {
         <Link
           href={project.websiteHref}
           className="text-link"
-          target="_blank"
-          rel="noreferrer"
+          target={websiteIsExternal ? '_blank' : undefined}
+          rel={websiteIsExternal ? 'noreferrer' : undefined}
         >
-          Product website
+          {project.websiteLabel}
           <ArrowUpRightIcon className="size-4" aria-hidden="true" />
         </Link>
       ) : (

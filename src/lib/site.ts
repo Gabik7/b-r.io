@@ -17,6 +17,7 @@ export type Project = {
   icon: string | null
   artwork: 'servicebook' | 'enselora' | 'setlyvo'
   websiteHref: string | null
+  websiteLabel: string | null
   appStoreHref: string | null
 }
 
@@ -33,6 +34,7 @@ export const projects: Project[] = [
     icon: '/projects/servicebook.png',
     artwork: 'servicebook',
     websiteHref: 'https://carservicebook.app',
+    websiteLabel: 'Product website',
     appStoreHref: 'https://apps.apple.com/us/app/car-service-book/id6468662179',
   },
   {
@@ -46,7 +48,8 @@ export const projects: Project[] = [
     year: '2026',
     icon: '/projects/enselora.png',
     artwork: 'enselora',
-    websiteHref: 'https://enseloraapp.sk',
+    websiteHref: '/apps/enselora',
+    websiteLabel: 'Explore ENSELORA',
     appStoreHref: null,
   },
   {
@@ -61,6 +64,7 @@ export const projects: Project[] = [
     icon: null,
     artwork: 'setlyvo',
     websiteHref: null,
+    websiteLabel: null,
     appStoreHref: null,
   },
 ]

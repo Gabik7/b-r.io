@@ -1,18 +1,46 @@
 import type { Metadata } from 'next'
 
+import { JsonLd } from '@/components/JsonLd'
 import { ProjectArtwork } from '@/components/ProjectArtwork'
 import { ProjectLinks } from '@/components/ProjectLinks'
+import { createPageMetadata, getSiteUrl } from '@/lib/metadata'
 import { projects } from '@/lib/site'
 
-export const metadata: Metadata = {
-  title: 'Projects',
-  description:
-    'ServiceBook, ENSELORA, and Setlyvo — iOS and web products by Gabriel Falis.',
-}
+const title = 'iOS Apps: ServiceBook, ENSELORA & Setlyvo'
+const description =
+  'Explore ServiceBook, ENSELORA, and Setlyvo: iPhone and web products designed and developed by Gabriel Falis in Slovakia.'
+
+export const metadata: Metadata = createPageMetadata({
+  title,
+  description,
+  path: '/projects',
+  heroTitle: 'ServiceBook, ENSELORA, and Setlyvo.',
+})
 
 export default function ProjectsPage() {
+  const siteUrl = getSiteUrl()
+
   return (
     <div className="px-4 pt-36 pb-28 sm:px-6 sm:pt-44 md:pb-40">
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'ItemList',
+          name: 'Apps by Gabriel Falis',
+          description,
+          itemListElement: projects.map((project, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            url:
+              project.artwork === 'enselora'
+                ? `${siteUrl}/apps/enselora`
+                : project.websiteHref?.startsWith('http')
+                  ? project.websiteHref
+                  : `${siteUrl}/projects#${project.artwork}`,
+            name: project.name,
+          })),
+        }}
+      />
       <header className="mx-auto grid max-w-7xl gap-10 border-b border-ink/12 pb-14 lg:grid-cols-[minmax(0,1fr)_25rem] lg:items-end">
         <h1 className="max-w-5xl text-[clamp(3.8rem,9vw,8.8rem)] leading-[0.86] font-medium tracking-[-0.06em] text-balance">
           Products in the real world.
@@ -27,7 +55,8 @@ export default function ProjectsPage() {
         {projects.map((project, index) => (
           <article
             key={project.name}
-            className="project-row grid gap-10 py-14 md:grid-cols-[minmax(16rem,0.84fr)_minmax(0,1.16fr)] md:items-center md:gap-16 lg:py-20"
+            id={project.artwork}
+            className="project-row grid scroll-mt-24 gap-10 py-14 md:grid-cols-[minmax(16rem,0.84fr)_minmax(0,1.16fr)] md:items-center md:gap-16 lg:py-20"
           >
             <ProjectArtwork project={project} priority={index === 0} />
             <div>
