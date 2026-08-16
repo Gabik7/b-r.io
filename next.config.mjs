@@ -17,23 +17,23 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: '/articles/:slug',
-        destination: '/posts/:slug',
+        source: '/articles/:path*',
+        destination: '/projects',
         permanent: true,
       },
       {
-        source: '/videos/:slug',
-        destination: '/posts/:slug',
+        source: '/videos/:path*',
+        destination: '/projects',
         permanent: true,
       },
       {
-        source: '/posts/my-desk-setup-for-2023',
-        destination: '/posts/desk-setup',
+        source: '/posts/:path+',
+        destination: '/projects',
         permanent: true,
       },
       {
         source: '/gear',
-        destination: '/uses',
+        destination: '/projects',
         permanent: true,
       },
       {

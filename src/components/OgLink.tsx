@@ -37,7 +37,10 @@ export async function OgLink({
   const needsMetadata = external && (showFavicon || (!children && !title))
   const meta = needsMetadata ? await getLinkMetadata(targetHref) : null
   const label =
-    children ?? title ?? meta?.title ?? (targetHref ? getHostname(targetHref) : null)
+    children ??
+    title ??
+    meta?.title ??
+    (targetHref ? getHostname(targetHref) : null)
 
   return (
     <a
@@ -50,14 +53,9 @@ export async function OgLink({
       {...props}
     >
       {showFavicon && meta?.favicon ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={meta.favicon}
-          alt=""
-          width={16}
-          height={16}
-          className="mr-1 inline size-[0.95em] max-h-4 translate-y-[-0.08em] rounded-sm"
-          loading="lazy"
+        <span
+          aria-hidden
+          className="mr-1 inline-block size-[0.55em] translate-y-[-0.04em] rounded-full bg-current opacity-50"
         />
       ) : null}
       {label}

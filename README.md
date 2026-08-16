@@ -1,24 +1,38 @@
-# Brian Ruiz
+# Gabriel Falis — Portfolio
 
-Personal site for [b-r.io](https://b-r.io) — portfolio, writing, projects, and uses.
+Personal portfolio and App Store support site for Gabriel Falis.
+
+## Included pages
+
+- Portfolio homepage
+- Projects
+- App support
+- Privacy Policy
+- Terms of Service
 
 ## Stack
 
-- [Next.js](https://nextjs.org) (App Router) + TypeScript
-- [MDX](https://mdxjs.com) for posts
-- [Tailwind CSS](https://tailwindcss.com) v4
-- [Motion](https://motion.dev) for animation
+- Next.js App Router and TypeScript
+- Tailwind CSS
+- GSAP with ScrollTrigger
+- Locally hosted Cabinet Grotesk
 
-## Getting started
+## Local development
 
-1. `npm install`
-2. Copy `.env.example` to `.env.local` and fill in values
-3. `npm run dev`
+```bash
+npm install
+npm run dev
+```
 
-## Environment
+The production build uses Next.js with Webpack for predictable builds across
+local and hosted environments.
 
-| Variable | Purpose |
-| --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | Canonical site URL (OG, sitemap, RSS) |
-| `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` | Mapbox GL (blog map demo) |
-| `CONVERTKIT_API_KEY` / `CONVERTKIT_FORM_ID` | Newsletter signup |
+Set `NEXT_PUBLIC_SITE_URL` to the production URL before deployment so metadata,
+robots, and the sitemap use the correct domain.
+
+## Before publishing
+
+Review the privacy policy against the real data practices of every app that
+links to it, including all analytics, crash reporting, accounts, advertising,
+cloud storage, and other third-party SDKs. Keep each app's App Store privacy
+answers consistent with the policy.

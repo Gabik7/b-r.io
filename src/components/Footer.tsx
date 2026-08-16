@@ -1,42 +1,43 @@
 import Link from 'next/link'
 
-import { ContainerInner, ContainerOuter } from '@/components/Container'
-
-function NavLink({
-  href,
-  children,
-}: {
-  href: string
-  children: React.ReactNode
-}) {
-  return (
-    <Link href={href} className="transition hover:text-accent">
-      {children}
-    </Link>
-  )
-}
+const links = [
+  { label: 'Projects', href: '/projects' },
+  { label: 'Support', href: '/support' },
+  { label: 'Privacy', href: '/privacy' },
+  { label: 'Terms', href: '/terms' },
+  { label: 'GitHub', href: 'https://github.com/Gabik7' },
+]
 
 export function Footer() {
   return (
-    <footer className="mt-32 flex-none">
-      <ContainerOuter>
-        <div className="border-t border-border pt-10 pb-16">
-          <ContainerInner>
-            <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
-              <div className="flex flex-wrap justify-center gap-x-6 gap-y-1 text-sm font-medium text-foreground">
-                <NavLink href="/about">About</NavLink>
-                <NavLink href="/posts">Posts</NavLink>
-                <NavLink href="/projects">Projects</NavLink>
-                <NavLink href="/uses">Uses</NavLink>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                &copy; {new Date().getFullYear()} Brian Ruiz. All rights
-                reserved.
-              </p>
-            </div>
-          </ContainerInner>
+    <footer className="px-4 pb-6 sm:px-6">
+      <div className="mx-auto max-w-7xl rounded-[2rem] bg-ink px-6 py-10 text-paper sm:px-10">
+        <div className="flex flex-col justify-between gap-10 md:flex-row md:items-end">
+          <div>
+            <p className="text-2xl font-medium tracking-tight">Gabriel Falis</p>
+            <p className="mt-2 max-w-sm text-sm text-paper/60">
+              Independent web and mobile app developer based in Slovakia.
+            </p>
+          </div>
+          <nav aria-label="Footer navigation">
+            <ul className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-paper/70">
+              {links.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    className="transition-colors hover:text-paper"
+                    href={link.href}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
-      </ContainerOuter>
+        <div className="mt-10 border-t border-paper/10 pt-5 text-xs text-paper/45">
+          © {new Date().getFullYear()} Gabriel Falis. All rights reserved.
+        </div>
+      </div>
     </footer>
   )
 }

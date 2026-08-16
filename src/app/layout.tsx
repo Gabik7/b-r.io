@@ -1,73 +1,57 @@
-import { type Metadata } from 'next'
-import { Inter, Source_Serif_4 } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
-import { SpeedInsights } from '@vercel/speed-insights/next'
+import type { Metadata, Viewport } from 'next'
+import localFont from 'next/font/local'
 
-import { Providers } from '@/app/providers'
 import { Layout } from '@/components/Layout'
-import {
-  siteOpenGraphImages,
-  siteTwitterMetadata,
-} from '@/lib/metadata'
 
 import '@/styles/tailwind.css'
 
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
+const cabinet = localFont({
+  src: [
+    { path: '../fonts/CabinetGrotesk-Regular.woff2', weight: '400' },
+    { path: '../fonts/CabinetGrotesk-Medium.woff2', weight: '500' },
+    { path: '../fonts/CabinetGrotesk-Bold.woff2', weight: '700' },
+  ],
+  variable: '--font-cabinet',
+  display: 'swap',
 })
 
-const sourceSerif = Source_Serif_4({
-  subsets: ['latin'],
-  style: ['normal', 'italic'],
-  variable: '--font-source-serif',
-})
-
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
-
-const title = 'Brian Ruiz - Software engineer and creator in NYC'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+const metadataBase = (() => {
+  try {
+    return new URL(siteUrl)
+  } catch {
+    return new URL('http://localhost:3000')
+  }
+})()
+const title = 'Gabriel Falis — Web & Mobile App Developer'
 const description =
-  'Software engineer in New York City crafting delightful user experiences and sharing videos about technology, productivity, design, and life.'
+  'Independent developer from Slovakia building thoughtful web and Apple-platform products.'
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: {
-    template: '%s - Brian Ruiz',
-    default: title,
-  },
+  metadataBase,
+  title: { default: title, template: '%s — Gabriel Falis' },
   description,
-  alternates: {
-    canonical: '/',
-    types: {
-      'application/rss+xml': '/feed.xml',
-    },
-  },
+  alternates: { canonical: '/' },
   openGraph: {
     title,
     description,
     url: '/',
-    siteName: 'Brian Ruiz',
+    siteName: 'Gabriel Falis',
     locale: 'en_US',
     type: 'website',
-    images: siteOpenGraphImages,
   },
-  twitter: {
-    ...siteTwitterMetadata,
-  },
+  twitter: { card: 'summary_large_image', title, description },
   icons: {
-    icon: [
-      { url: '/favicon/favicon.ico' },
-      { url: '/favicon/favicon.svg', type: 'image/svg+xml' },
-      {
-        url: '/favicon/favicon-96x96.png',
-        sizes: '96x96',
-        type: 'image/png',
-      },
-    ],
+    icon: [{ url: '/favicon/favicon.svg', type: 'image/svg+xml' }],
     apple: '/favicon/apple-touch-icon.png',
   },
   manifest: '/favicon/site.webmanifest',
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#f4f1e9',
 }
 
 export default function RootLayout({
@@ -76,19 +60,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html
-      lang="en"
-      className={`${inter.className} ${inter.variable} ${sourceSerif.variable} h-full antialiased`}
-      suppressHydrationWarning
-    >
-      <body className="flex h-full bg-card sm:bg-background">
-        <Providers>
-          <div className="flex w-full">
-            <Layout>{children}</Layout>
-          </div>
-          <Analytics />
-          <SpeedInsights />
-        </Providers>
+    <html lang="en" className={`${cabinet.variable} h-full antialiased`}>
+      <body className="min-h-full bg-paper text-ink">
+        <Layout>{children}</Layout>
       </body>
     </html>
   )
