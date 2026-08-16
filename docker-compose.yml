@@ -1,0 +1,105 @@
+name: gfcodes-platform
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+services:
+  caddy:
+    image: caddy:2.11.4-alpine
+    restart: unless-stopped
+    depends_on:
+      site:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    environment:
+      ACME_EMAIL: ${ACME_EMAIL}
+      SITE_DOMAIN: ${SITE_DOMAIN}
+      API_DOMAIN: ${API_DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./infra/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - edge
+    logging: *default-logging
+
+  site:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_SITE_URL: https://${SITE_DOMAIN}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - edge
+    logging: *default-logging
+
+  api:
+    build:
+      context: ./services/api
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      API_PUBLIC_URL: https://${API_DOMAIN}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      ENSELORA_GEMINI_API_KEY: ${ENSELORA_GEMINI_API_KEY}
+      ENSELORA_GEMINI_MODEL: ${ENSELORA_GEMINI_MODEL:-gemini-2.5-flash}
+      ENSELORA_REPLICATE_API_TOKEN: ${ENSELORA_REPLICATE_API_TOKEN}
+      ENSELORA_REPLICATE_BACKGROUND_MODEL: ${ENSELORA_REPLICATE_BACKGROUND_MODEL}
+      ENSELORA_REVENUECAT_SECRET_API_KEY: ${ENSELORA_REVENUECAT_SECRET_API_KEY}
+      ENSELORA_SUPABASE_URL: ${ENSELORA_SUPABASE_URL}
+      ENSELORA_SUPABASE_PUBLISHABLE_KEY: ${ENSELORA_SUPABASE_PUBLISHABLE_KEY}
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:4321/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - edge
+      - backend
+    logging: *default-logging
+
+  redis:
+    image: redis:8.8.1-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--appendfsync", "everysec", "--requirepass", "${REDIS_PASSWORD}"]
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend
+    logging: *default-logging
+
+networks:
+  edge:
+  backend:
+    internal: true
+
+volumes:
+  caddy_data:
+  caddy_config:
+  redis_data:

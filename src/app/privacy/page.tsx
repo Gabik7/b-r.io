@@ -186,10 +186,10 @@ export default function PrivacyPage() {
         <p>
           Depending on the selected ENSELORA feature, service providers may
           include Apple, Supabase, Google Gemini, Replicate and its named model
-          providers, RevenueCat, Upstash, PostHog, Sentry, Vercel, and Resend.
+          providers, RevenueCat, PostHog, Sentry, and the infrastructure provider
+          hosting the self-managed GFCodes web, API, and private Redis service.
           They process information only for the relevant hosting, account,
-          purchase, AI, rate-limiting, analytics, diagnostics, or support
-          purpose.
+          purchase, AI, rate-limiting, analytics, diagnostics, or support purpose.
         </p>
         <p>
           Providers may process information outside the European Economic Area.

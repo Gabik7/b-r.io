@@ -7,7 +7,7 @@ export function getSiteUrl() {
   const configuredUrl =
     process.env.NEXT_PUBLIC_SITE_URL ??
     (process.env.NODE_ENV === 'production'
-      ? 'https://gfcodes-com.vercel.app'
+      ? 'https://gfcodes.com'
       : 'http://localhost:3000')
 
   return configuredUrl.replace(/\/$/, '')
