@@ -4,11 +4,11 @@ import { ogSize } from '@/lib/og'
 import { homeHeroTitle } from '@/lib/site-copy'
 
 export function getSiteUrl() {
-  const vercelUrl =
-    process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL
   const configuredUrl =
     process.env.NEXT_PUBLIC_SITE_URL ??
-    (vercelUrl ? `https://${vercelUrl}` : 'http://localhost:3000')
+    (process.env.NODE_ENV === 'production'
+      ? 'https://gfcodes-com.vercel.app'
+      : 'http://localhost:3000')
 
   return configuredUrl.replace(/\/$/, '')
 }

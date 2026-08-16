@@ -30,8 +30,11 @@ local and hosted environments.
 
 Set `NEXT_PUBLIC_SITE_URL` to one stable production domain before deployment so
 canonical metadata, social cards, robots, the sitemap, and structured data all
-use the same public origin. Vercel's production URL is used as a fallback when
-the variable is not set; localhost is used only during local development.
+use the same public origin. The public `https://gfcodes-com.vercel.app` alias is
+used as a production fallback when the variable is not set; localhost is used
+only during local development. Do not rely on Vercel's
+`VERCEL_PROJECT_PRODUCTION_URL` for this project because it currently resolves
+to an unconfigured `www.gfcodes.com` domain.
 
 Do not use `b-r.io` unless ownership and DNS are transferred: the domain still
 serves the original developer's website and is not the canonical URL for this
