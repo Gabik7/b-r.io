@@ -115,7 +115,7 @@ Povinné hodnoty:
 | `API_DOMAIN` | `api.gfcodes.com` |
 | `REDIS_PASSWORD` | nový náhodný reťazec; vytvor cez `openssl rand -base64 48` |
 | `ENSELORA_GEMINI_API_KEY` | Google AI Studio / Gemini server key |
-| `ENSELORA_GEMINI_MODEL` | predvolene `gemini-2.5-flash` |
+| `ENSELORA_GEMINI_MODEL` | `gemini-3.7-flash` |
 | `ENSELORA_REPLICATE_API_TOKEN` | Replicate token začínajúci `r8_` |
 | `ENSELORA_REPLICATE_BACKGROUND_MODEL` | úplný model a version hash z príkladu |
 | `ENSELORA_REPLICATE_TRYON_MODEL_PRIMARY` | primárny Replicate Try-On model |
@@ -132,7 +132,9 @@ Povinné hodnoty:
 | `ENSELORA_APP_ATTEST_APP_ID` | `P657J6X62B.com.gabriel.enselora` |
 | `ENSELORA_APP_ATTEST_ENVIRONMENT` | pre TestFlight/produkciu `production` |
 | `ENSELORA_ADMIN_API_KEY` | nový dlhý náhodný serverový secret |
-| `ENSELORA_*_COST_MICROS` | aktuálne nákladové odhady; do overenia môžu zostať `0` |
+| `ENSELORA_GEMINI_INPUT_MICROS_PER_MILLION` | `750000` – úvodná cena Gemini 3.7 Flash do 31. 12. 2026 |
+| `ENSELORA_GEMINI_OUTPUT_MICROS_PER_MILLION` | `3750000` – úvodná cena Gemini 3.7 Flash do 31. 12. 2026 |
+| ostatné `ENSELORA_*_COST_MICROS` | aktuálne nákladové odhady; do overenia môžu zostať `0` |
 | `ENSELORA_DAILY_COST_ALERT_MICROS` | denný limit; `0` počas úvodného merania |
 | `ENSELORA_COST_ALERT_WEBHOOK_URL` | voliteľný HTTPS alert webhook |
 

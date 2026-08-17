@@ -101,7 +101,7 @@ export async function geminiJSON<T>(
   audit?: { userId: string; requestId: string; operation: string },
 ): Promise<T> {
   const apiKey = process.env.ENSELORA_GEMINI_API_KEY;
-  const model = process.env.ENSELORA_GEMINI_MODEL || "gemini-2.5-flash";
+  const model = process.env.ENSELORA_GEMINI_MODEL || "gemini-3.7-flash";
   if (!apiKey) throw new ApiError(503, "AI služba ešte nie je nakonfigurovaná.");
   const parts: Record<string, unknown>[] = [{ text: prompt }];
   for (const item of image ? (Array.isArray(image) ? image : [image]) : []) {
@@ -112,8 +112,11 @@ export async function geminiJSON<T>(
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contents: [{ role: "user", parts }], generationConfig: { responseMimeType: "application/json", temperature: 0.2 } }),
-      signal: AbortSignal.timeout(30_000),
+      body: JSON.stringify({
+        contents: [{ role: "user", parts }],
+        generationConfig: { responseMimeType: "application/json" },
+      }),
+      signal: AbortSignal.timeout(60_000),
     },
   );
   if (!response.ok) throw new ApiError(response.status === 429 ? 429 : 502, "AI model momentálne neodpovedá.");
