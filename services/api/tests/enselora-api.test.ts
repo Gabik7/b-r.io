@@ -2,8 +2,9 @@ import { describe, expect, test } from "bun:test";
 import { createHmac } from "node:crypto";
 import { ApiError, authenticatedRequestIdentity, imageDataUrl, premiumEntitlementForUsage, rateLimitKey, requestIdentity, responseLanguage, tryOnQuotaKey, usageQuotaKey } from "../src/apps/enselora/api";
 import { constantTimeSecretMatch } from "../src/apps/enselora/app-attest";
-import { webhookAuthorized } from "../src/apps/enselora/commerce";
+import { revenueCatEventUserId, webhookAuthorized } from "../src/apps/enselora/commerce";
 import { runtimeConfigStatus } from "../src/apps/enselora/config";
+import { supabaseAdminHeaders } from "../src/apps/enselora/supabase-admin";
 
 describe("ENSELORA API validation", () => {
   test("accepts a bounded JPEG base64 image", () => {
@@ -78,6 +79,24 @@ describe("ENSELORA API validation", () => {
 
     expect(webhookAuthorized(request, rawBody)).toBe(true);
     expect(webhookAuthorized(request, `${rawBody} `)).toBe(false);
+  });
+
+  test("does not attach RevenueCat dashboard test events to a synthetic auth user", () => {
+    expect(revenueCatEventUserId({
+      id: "test-event",
+      type: "TEST",
+      app_user_id: "e31ca306-9680-4560-979a-f2009d78b97b",
+    })).toBeUndefined();
+  });
+
+  test("uses new Supabase secret keys only as API keys", () => {
+    expect(supabaseAdminHeaders("sb_secret_example")).toEqual({
+      apikey: "sb_secret_example",
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    });
+    expect(supabaseAdminHeaders("legacy-service-role-jwt").Authorization)
+      .toBe("Bearer legacy-service-role-jwt");
   });
 
   test("compares admin secrets without a partial match", () => {

@@ -7,6 +7,19 @@ function configuration(): { url: string; secret: string } {
   return { url, secret };
 }
 
+export function supabaseAdminHeaders(secret: string): Record<string, string> {
+  const headers: Record<string, string> = {
+    apikey: secret,
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  };
+
+  // New sb_secret_* keys authenticate through the apikey header. Legacy
+  // service_role keys are JWTs and must also be sent as a Bearer token.
+  if (!secret.startsWith("sb_secret_")) headers.Authorization = `Bearer ${secret}`;
+  return headers;
+}
+
 export async function supabaseAdmin<T>(
   path: string,
   options: { method?: string; body?: unknown; prefer?: string } = {},
@@ -16,10 +29,7 @@ export async function supabaseAdmin<T>(
     {
       method: options.method || "GET",
       headers: {
-        apikey: secret,
-        Authorization: `Bearer ${secret}`,
-        "Content-Type": "application/json",
-        Accept: "application/json",
+        ...supabaseAdminHeaders(secret),
         ...(options.prefer ? { Prefer: options.prefer } : {}),
       },
       body: options.body === undefined ? undefined : JSON.stringify(options.body),

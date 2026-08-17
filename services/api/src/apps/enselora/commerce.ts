@@ -20,6 +20,14 @@ function uuid(value: unknown): string | undefined {
     : undefined;
 }
 
+export function revenueCatEventUserId(event: RevenueCatEvent): string | undefined {
+  // RevenueCat's dashboard TEST event contains a synthetic UUID that is not a
+  // Supabase Auth user. Persist the event, but do not attach it to the auth FK
+  // or run entitlement/credit mutations for that synthetic identity.
+  if (event.type === "TEST") return undefined;
+  return uuid(event.app_user_id) || event.aliases?.map(uuid).find(Boolean);
+}
+
 export function webhookAuthorized(request: Request, rawBody: string): boolean {
   const expectedAuthorization = process.env.ENSELORA_REVENUECAT_WEBHOOK_AUTHORIZATION || "";
   if (!expectedAuthorization || request.headers.get("authorization") !== expectedAuthorization) return false;
@@ -73,7 +81,7 @@ export async function processRevenueCatWebhook(request: Request, rawBody: string
   try { payload = JSON.parse(rawBody) as { event?: RevenueCatEvent }; } catch { throw new ApiError(400, "Webhook nemá platný JSON formát."); }
   const event = payload.event;
   if (!event?.id || !event.type || !event.app_user_id) throw new ApiError(400, "Webhook neobsahuje povinné polia.");
-  const userId = uuid(event.app_user_id) || event.aliases?.map(uuid).find(Boolean);
+  const userId = revenueCatEventUserId(event);
   const inserted = await supabaseAdmin<Array<{ event_id: string }>>("revenuecat_webhook_events?on_conflict=event_id", {
     method: "POST",
     prefer: "resolution=ignore-duplicates,return=representation",
