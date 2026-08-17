@@ -1,0 +1,15 @@
+# Ploi terminates HTTPS and proxies the public domains to these loopback ports.
+# The Caddy service remains available for standalone deployments, but is disabled
+# by default whenever this override is used.
+services:
+  caddy:
+    profiles:
+      - standalone-caddy
+
+  site:
+    ports:
+      - "127.0.0.1:3000:3000"
+
+  api:
+    ports:
+      - "127.0.0.1:4321:4321"

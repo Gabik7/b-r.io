@@ -13,15 +13,17 @@ kvóty a samostatný Supabase projekt.
 | `services/api/` | Astro/Node API pre mobilné aplikácie |
 | `services/api/src/apps/enselora/` | ENSELORA validácia, autentifikácia a AI orchestration |
 | `services/api/src/pages/v1/enselora/` | Verejné ENSELORA API endpointy |
-| `infra/Caddyfile` | HTTPS terminácia a reverse proxy |
-| `docker-compose.yml` | web, API, Redis a Caddy pre jeden VPS |
-| `VPS_DEPLOYMENT.md` | kompletný produkčný postup |
+| `docker-compose.yml` | web, API, Redis a voliteľný Caddy pre samostatný VPS |
+| `docker-compose.ploi.yml` | Ploi override: vypne Caddy a vystaví iba lokálne proxy porty |
+| `infra/Caddyfile` | alternatívny proxy mimo Ploi; v Ploi produkcii sa nepoužíva |
+| `VPS_DEPLOYMENT.md` | kompletný postup pre Hetzner + Ploi + Namecheap |
 
 ## Architektúra
 
 - Next.js 16 standalone kontajner obsluhuje portfólio a spoločné legal/support URL.
 - Astro 7 s Node adapterom obsluhuje verzované API.
-- Caddy automaticky vystaví a obnovuje TLS certifikáty.
+- V produkcii Ploi/Nginx terminujú HTTPS a Ploi obnovuje Let's Encrypt
+  certifikáty. Caddy zostáva iba ako alternatíva pre server bez Ploi.
 - Redis je dostupný iba na internej Docker sieti a drží rate limit, idempotenciu a
   nákladové kvóty. Nie je verejne vystavený.
 - ENSELORA používa vlastný Supabase projekt. Ďalšia aplikácia má mať nový projekt,
@@ -68,5 +70,6 @@ bun run build
 - ENSELORA API: `https://api.gfcodes.com/v1/enselora`
 
 Právny text musí byť pred vydaním skontrolovaný podľa reálnych dátových tokov a
-App Store privacy odpovede sa s ním musia zhodovať. Produkčné nasadenie a postup
-pridania ďalšej aplikácie sú v `VPS_DEPLOYMENT.md`.
+App Store privacy odpovede sa s ním musia zhodovať. Produkčné nasadenie na Hetzner
+cez Ploi, Namecheap DNS, SSL, aktualizácie, rollback aj postup pridania ďalšej
+aplikácie sú v `VPS_DEPLOYMENT.md`.
