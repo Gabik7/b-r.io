@@ -1,8 +1,20 @@
 import type { APIRoute } from "astro";
 import { json, redisIsReady } from "../apps/enselora/api";
+import { runtimeConfigStatus } from "../apps/enselora/config";
 
 export const prerender = false;
 export const GET: APIRoute = async () => {
   const redis = await redisIsReady();
-  return json({ ok: redis, service: "gfcodes-api", dependencies: { redis } }, redis ? 200 : 503);
+  const configuration = runtimeConfigStatus();
+  const ok = redis && configuration.ready;
+  return json({
+    ok,
+    service: "gfcodes-api",
+    dependencies: { redis },
+    configuration: {
+      ready: configuration.ready,
+      missing: configuration.missing,
+      invalid: configuration.invalid,
+    },
+  }, ok ? 200 : 503);
 };

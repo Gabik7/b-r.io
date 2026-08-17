@@ -108,6 +108,13 @@ export default function TermsPage() {
           in iOS Settings → Apple Account → Subscriptions. Deleting an app does
           not cancel a subscription.
         </p>
+        <p>
+          Some apps may offer consumable credits. Credits are attached to the
+          app account identified at purchase, are not a subscription, and are
+          consumed only after an included allowance is exhausted. Purchases and
+          refund eligibility remain subject to Apple&apos;s rules. A failed
+          provider operation should not consume a credit.
+        </p>
       </section>
 
       <section id="enselora" className="scroll-mt-24">
@@ -133,6 +140,12 @@ export default function TermsPage() {
           Try-On allowance, advanced insights, editing tools, and optional cloud
           sync. The exact features, limits, price, billing period, and any
           introductory offer are shown in the app before purchase.
+        </p>
+        <p>
+          Optional Try-On credit packs may be offered after their price and
+          quantity are shown in the App Store purchase sheet. They do not expire
+          because a monthly allowance resets, but require the same ENSELORA
+          account to restore their server-recorded balance.
         </p>
 
         <h3>AI suggestions and virtual Try-On</h3>

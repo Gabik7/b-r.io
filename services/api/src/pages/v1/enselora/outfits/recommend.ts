@@ -1,12 +1,13 @@
 import type { APIRoute } from "astro";
-import { ApiError, authenticatedRequestIdentity, claimJSONRequest, completeJSONRequest, enforceRateLimit, geminiJSON, handleApiError, json, premiumEntitlementForUsage, readJson, releaseJSONRequest, releaseUsage, reserveUsage, responseLanguage } from "../../../../apps/enselora/api";
+import { ApiError, authenticatedRequestIdentity, claimJSONRequest, completeJSONRequest, enforceRateLimit, geminiJSON, handleApiError, json, parseJson, premiumEntitlementForUsage, readRawBody, releaseJSONRequest, releaseUsage, reserveUsage, responseLanguage } from "../../../../apps/enselora/api";
+import { verifyRequestAppAttest } from "../../../../apps/enselora/app-attest";
 
 export const prerender = false;
 type Garment = { id: string; name: string; category: string; colorName: string; season: string; wearCount: number; material?: string; pattern?: string };
 type Body = {
   wardrobe?: Garment[];
   context?: { temperature?: number; weatherSymbol?: string; occasions?: string[] };
-  signals?: { preferredGarmentIDs?: string[]; avoidedGarmentIDs?: string[]; rejectionReasons?: string[] };
+  signals?: { preferredGarmentIDs?: string[]; avoidedGarmentIDs?: string[]; rejectionReasons?: string[]; preferredColors?: string[]; preferredCategories?: string[]; provenPairings?: string[][] };
   count?: number;
   locale?: string;
 };
@@ -20,11 +21,13 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     const identity = await authenticatedRequestIdentity(request);
     requestId = identity.requestId;
+    const rawBody = await readRawBody(request);
+    await verifyRequestAppAttest(request, identity.userId, rawBody);
     const claim = await claimJSONRequest(identity.userId, identity.requestId, "outfit-recommendation");
     if (claim.cached !== undefined) return json(claim.cached);
     idempotencyKey = claim.key;
     await enforceRateLimit(identity.userId, "outfit-recommendation", 60, 3600);
-    const body = await readJson<Body>(request);
+    const body = parseJson<Body>(rawBody);
     const wardrobe = Array.isArray(body.wardrobe) ? body.wardrobe.slice(0, 100) : [];
     if (wardrobe.length < 3) throw new ApiError(400, "Na outfit potrebuješ aspoň tri kúsky.");
     const safe = wardrobe.map(({ id, name, category, colorName, season, wearCount, material, pattern }) => ({ id, name: String(name).slice(0, 80), category, colorName: String(colorName).slice(0, 40), season: String(season).slice(0, 40), wearCount: Number(wearCount) || 0, material: String(material || "").slice(0, 40), pattern: String(pattern || "").slice(0, 40) }));
@@ -33,6 +36,9 @@ export const POST: APIRoute = async ({ request }) => {
       preferredGarmentIDs: (body.signals?.preferredGarmentIDs || []).filter((id) => ids.has(id)).slice(0, 30),
       avoidedGarmentIDs: (body.signals?.avoidedGarmentIDs || []).filter((id) => ids.has(id)).slice(0, 30),
       rejectionReasons: (body.signals?.rejectionReasons || []).map((item) => String(item).slice(0, 80)).slice(0, 10),
+      preferredColors: (body.signals?.preferredColors || []).map((item) => String(item).slice(0, 40)).slice(0, 5),
+      preferredCategories: (body.signals?.preferredCategories || []).map((item) => String(item).slice(0, 40)).slice(0, 5),
+      provenPairings: (body.signals?.provenPairings || []).map((pair) => pair.filter((id) => ids.has(id)).slice(0, 2)).filter((pair) => pair.length === 2).slice(0, 12),
     };
     const requestedCount = Math.min(3, Math.max(1, Math.round(Number(body.count) || 1)));
     const isPremium = await premiumEntitlementForUsage(identity.userId);
@@ -49,7 +55,7 @@ export const POST: APIRoute = async ({ request }) => {
         : "Dnešný bezplatný AI návrh bol využitý. Ďalší je dostupný zajtra alebo s ENSELORA+.",
     );
     reservationKey = reservation.key;
-    const result = await geminiJSON<Result>(`You are a practical personal stylist. Create ${requestedCount} meaningfully different outfits, each using 3-4 compatible real items only from this JSON wardrobe. Vary silhouette or layer while respecting context, category balance, weather, occasion and underused items. Prefer positively rated garments when they fit. Avoid negatively rated garments and rejection patterns when enough alternatives exist; never sacrifice weather or occasion suitability. Return only JSON with an outfits array; every item has title and explanation in ${responseLanguage(body.locale)} plus itemIDs. Wardrobe: ${JSON.stringify(safe)} Context: ${JSON.stringify(body.context || {})} Learned signals: ${JSON.stringify(signals)}`);
+    const result = await geminiJSON<Result>(`You are a practical personal stylist. Create ${requestedCount} meaningfully different outfits, each using 3-4 compatible real items only from this JSON wardrobe. Vary silhouette or layer while respecting context, category balance, weather, occasion and underused items. Prefer positively rated garments when they fit. Avoid negatively rated garments and rejection patterns when enough alternatives exist; never sacrifice weather or occasion suitability. Return only JSON with an outfits array; every item has title and explanation in ${responseLanguage(body.locale)} plus itemIDs. Wardrobe: ${JSON.stringify(safe)} Context: ${JSON.stringify(body.context || {})} Learned signals: ${JSON.stringify(signals)}`, undefined, { userId: identity.userId, requestId: identity.requestId, operation: "outfit-recommendation" });
     const allowed = new Set(safe.map((item) => item.id));
     const seenCombinations = new Set<string>();
     result.outfits = (result.outfits || []).slice(0, requestedCount).map((outfit) => ({

@@ -20,10 +20,18 @@ export function handleApiError(error: unknown, requestId?: string): Response {
 }
 
 export async function readJson<T>(request: Request): Promise<T> {
+  return parseJson<T>(await readRawBody(request));
+}
+
+export async function readRawBody(request: Request): Promise<string> {
   const length = Number(request.headers.get("content-length") || 0);
   if (length > 30 * 1024 * 1024) throw new ApiError(413, "Požiadavka je príliš veľká.");
   const text = await request.text();
   if (text.length > 30 * 1024 * 1024) throw new ApiError(413, "Požiadavka je príliš veľká.");
+  return text;
+}
+
+export function parseJson<T>(text: string): T {
   try {
     return JSON.parse(text) as T;
   } catch {
@@ -87,12 +95,18 @@ export function responseLanguage(locale: unknown): string {
   return "Slovak";
 }
 
-export async function geminiJSON<T>(prompt: string, image?: { base64: string; mimeType: string }): Promise<T> {
+export async function geminiJSON<T>(
+  prompt: string,
+  image?: { base64: string; mimeType: string } | Array<{ base64: string; mimeType: string }>,
+  audit?: { userId: string; requestId: string; operation: string },
+): Promise<T> {
   const apiKey = process.env.ENSELORA_GEMINI_API_KEY;
   const model = process.env.ENSELORA_GEMINI_MODEL || "gemini-2.5-flash";
   if (!apiKey) throw new ApiError(503, "AI služba ešte nie je nakonfigurovaná.");
   const parts: Record<string, unknown>[] = [{ text: prompt }];
-  if (image) parts.push({ inlineData: { mimeType: image.mimeType, data: image.base64 } });
+  for (const item of image ? (Array.isArray(image) ? image : [image]) : []) {
+    parts.push({ inlineData: { mimeType: item.mimeType, data: item.base64 } });
+  }
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`,
     {
@@ -106,12 +120,32 @@ export async function geminiJSON<T>(prompt: string, image?: { base64: string; mi
   const payload = await response.json() as any;
   const text = payload?.candidates?.[0]?.content?.parts?.[0]?.text;
   if (typeof text !== "string") throw new ApiError(502, "AI model vrátil neplatnú odpoveď.");
-  try { return JSON.parse(text) as T; } catch { throw new ApiError(502, "AI model vrátil neplatnú odpoveď."); }
+  try {
+    const parsed = JSON.parse(text) as T;
+    if (audit) {
+      const inputUnits = Number(payload?.usageMetadata?.promptTokenCount || 0);
+      const outputUnits = Number(payload?.usageMetadata?.candidatesTokenCount || 0);
+      const inputRate = Number(process.env.ENSELORA_GEMINI_INPUT_MICROS_PER_MILLION || 0);
+      const outputRate = Number(process.env.ENSELORA_GEMINI_OUTPUT_MICROS_PER_MILLION || 0);
+      const estimatedCostMicros = Math.round((inputUnits * inputRate + outputUnits * outputRate) / 1_000_000);
+      const { recordAIUsage } = await import("./usage");
+      await recordAIUsage({ ...audit, provider: "gemini", model, inputUnits, outputUnits, estimatedCostMicros });
+    }
+    return parsed;
+  } catch (error) {
+    if (error instanceof SyntaxError) throw new ApiError(502, "AI model vrátil neplatnú odpoveď.");
+    throw error;
+  }
 }
 
 type Prediction = { status?: string; output?: string | string[]; error?: string; urls?: { get?: string } };
 
-export async function replicateRun(model: string, input: Record<string, unknown>, official = false): Promise<string> {
+export async function replicateRun(
+  model: string,
+  input: Record<string, unknown>,
+  official = false,
+  audit?: { userId: string; requestId: string; operation: string; estimatedCostMicros: number },
+): Promise<string> {
   const token = process.env.ENSELORA_REPLICATE_API_TOKEN;
   if (!token) throw new ApiError(503, "Obrazová služba ešte nie je nakonfigurovaná.");
   const url = official
@@ -140,6 +174,10 @@ export async function replicateRun(model: string, input: Record<string, unknown>
   if (prediction.status !== "succeeded") throw new ApiError(504, "Generovanie trvalo príliš dlho. Skús to znova.");
   const output = Array.isArray(prediction.output) ? prediction.output[0] : prediction.output;
   if (!output || !/^https:\/\//.test(output)) throw new ApiError(502, "Obrazový model vrátil neplatný výsledok.");
+  if (audit) {
+    const { recordAIUsage } = await import("./usage");
+    await recordAIUsage({ ...audit, provider: "replicate", model });
+  }
   return output;
 }
 
@@ -234,6 +272,10 @@ async function redisPipeline(commands: unknown[][]): Promise<Array<{ result: unk
     console.error("GFCodes Redis command failed", { message: error instanceof Error ? error.message : "unknown" });
     throw new ApiError(503, "Kvótu sa nepodarilo overiť.");
   }
+}
+
+export async function redisCommands(commands: unknown[][]): Promise<Array<{ result: unknown }>> {
+  return redisPipeline(commands);
 }
 
 export async function redisIsReady(): Promise<boolean> {

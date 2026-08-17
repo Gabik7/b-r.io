@@ -118,14 +118,16 @@ export default function PrivacyPage() {
         <p>
           Without signing in, the wardrobe, profile, photos, outfits, and
           history remain stored locally in the iPhone app. Try-On history,
-          including the person photo and result, remains local and is not
-          synced.
+          including the person photo and result, remains local unless an
+          eligible user separately enables Try-On sync.
         </p>
         <p>
           Optional Sign in with Apple creates an account through Supabase Auth.
           If an eligible ENSELORA+ user enables sync, profile, wardrobe, outfit,
-          wear-history and travel-plan records, plus clothing photos, are stored
-          in a private Supabase database and storage bucket. Access rules
+          wear-history, shopping-list and travel-plan records, plus clothing
+          photos, are stored in a private Supabase database and storage bucket.
+          If Try-On sync is explicitly enabled, its source and result photos are
+          stored in a separate private bucket. Access rules
           restrict an account to its own records and files. Changes are saved
           locally before transfer over HTTPS.
         </p>
@@ -134,12 +136,15 @@ export default function PrivacyPage() {
         <p>
           Basic foreground separation may run on the iPhone through Apple
           Vision. If you choose remote clothing recognition, fallback background
-          removal, outfit generation, or virtual Try-On, the information
+          removal, multi-item or video-frame wardrobe scanning, outfit
+          generation, or virtual Try-On, the information
           required for that request is sent through the ENSELORA service after
           the relevant consent. Google Gemini may process clothing recognition
           and outfit composition. Replicate may process fallback background
-          removal through 851 Labs and virtual Try-On through Pruna. Try-On may
-          include a full-body photo and photos of selected clothes.
+          removal through 851 Labs and virtual Try-On through configured model
+          providers. A higher-quality Try-On request may compare approved model
+          outputs and use Gemini to select the strongest preservation result.
+          Try-On may include a full-body photo and photos of selected clothes.
         </p>
         <p>
           Submitted photos are not used by Gabriel Falis for advertising or to
@@ -154,8 +159,11 @@ export default function PrivacyPage() {
         <h3>Weather, location, and calendar</h3>
         <p>
           Location is optional. If allowed, approximate location is used with
-          Apple WeatherKit to retrieve local weather. The latest coordinates and
-          weather response are kept only in a daily cache on the device.
+          Apple WeatherKit to retrieve local weather. A destination entered for
+          a travel plan may be geocoded and queried through WeatherKit without
+          requesting the device location. Coordinates and forecast details may
+          be retained with that travel plan and included in optional cloud sync.
+          Weather responses are also kept in a time-limited device cache.
           Location is not used for advertising or cross-app tracking. Optional
           calendar event titles are processed on device and are not stored by
           ENSELORA.
@@ -164,8 +172,9 @@ export default function PrivacyPage() {
         <h3>Subscriptions</h3>
         <p>
           Apple processes purchases through the App Store. RevenueCat helps
-          verify subscription status and may process a pseudonymous app-user
-          identifier, product, transaction, and entitlement information.
+          verify subscription status and consumable Try-On credits and may
+          process a pseudonymous app-user identifier, product, transaction,
+          webhook event, credit-ledger entry, and entitlement information.
           ENSELORA does not receive the full payment-card number.
         </p>
 
@@ -178,6 +187,14 @@ export default function PrivacyPage() {
           names, outfit text, or the account email. Session replay, automatic
           screen capture, and cross-app tracking are not used. Consent can be
           withdrawn in the app under Account &amp; Sync.
+        </p>
+        <p>
+          The server records pseudonymous AI operation, model, token or unit
+          count, estimated cost, request identifier, and timestamp for quota,
+          abuse prevention, cost monitoring, and operations. It does not store
+          the submitted image or generated image in those cost records. App
+          Attest may store a device-generated public key, receipt, assertion
+          counter, and last-use time to verify genuine app requests.
         </p>
       </section>
 

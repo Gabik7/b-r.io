@@ -27,7 +27,7 @@ const faqs = [
   {
     question: 'Where are wardrobe photos stored?',
     answer:
-      'Wardrobe photos stay on the iPhone by default. If an ENSELORA+ user enables cloud sync, clothing photos and wardrobe records can be stored in that user’s private Supabase account. Try-On person photos and Try-On history are not synced.',
+      'Wardrobe photos stay on the iPhone by default. If an ENSELORA+ user enables cloud sync, clothing photos and wardrobe records can be stored in that user’s private Supabase account. Try-On photos remain local unless the user separately enables private Try-On sync.',
   },
   {
     question: 'Does ENSELORA send photos to AI services?',
@@ -90,8 +90,11 @@ export default function EnseloraPage() {
               },
               featureList: [
                 'Local-first digital wardrobe',
+                'Multi-item photo and wardrobe-video scan',
                 'Outfit suggestions from clothes you own',
-                'Weather-aware outfit planning',
+                'Local and destination weather-aware planning',
+                'Travel capsule and packing lists',
+                'Shareable outfit cards and optional shopping list',
                 'Optional Sign in with Apple and cloud sync',
                 'Optional AI clothing analysis and virtual Try-On',
               ],

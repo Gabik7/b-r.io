@@ -60,13 +60,48 @@ Povinné premenné sú zdokumentované v `.env.vps.example` a majú prefix
 | Metóda | Endpoint |
 | --- | --- |
 | `POST` | `/v1/enselora/garments/analyze` |
+| `POST` | `/v1/enselora/garments/detect` |
 | `POST` | `/v1/enselora/outfits/recommend` |
 | `POST` | `/v1/enselora/images/remove-background` |
 | `POST` | `/v1/enselora/try-on` |
+| `GET` | `/v1/enselora/credits` |
+| `POST` | `/v1/enselora/app-attest/challenge` |
+| `POST` | `/v1/enselora/app-attest/register` |
+| `POST` | `/v1/enselora/webhooks/revenuecat` |
+| `GET` | `/v1/enselora/admin/costs?days=30` |
+| `POST` | `/v1/enselora/admin/entitlements/audit` |
 
 Každá požiadavka musí poslať `X-ENSELORA-Client: ios`, installation ID a platný
 Supabase bearer JWT. API nemá kompatibilný anonymný bypass. ENSELORA má vlastný
 Supabase projekt; databázy rôznych aplikácií sa nemajú zdieľať.
+
+### Povinné poradie aktivácie
+
+1. V ENSELORA repozitári spusti `supabase db push`. Nová migrácia vytvorí
+   App Attest kľúče, RevenueCat audit udalostí, serverový kreditný ledger,
+   AI cost udalosti a private `tryon-images` bucket.
+2. Na VPS nastav `ENSELORA_SUPABASE_SECRET_KEY` na nový `sb_secret_...` serverový
+   kľúč. Nikdy ho nevkladaj do iOS klienta ani verejného Next.js kontajnera.
+3. V RevenueCat nastav webhook URL
+   `https://api.gfcodes.com/v1/enselora/webhooks/revenuecat`, vlastný Authorization
+   header aj HMAC signing secret. Rovnaké hodnoty vlož do VPS env. Pošli test event
+   a over riadok `processed_at` v `revenuecat_webhook_events`.
+4. V App Store Connect vytvor consumable produkt
+   `com.gabriel.enselora.tryon.credits10`; v RevenueCat ho namapuj na 10 kreditov.
+   Klientsky flag zapni až po úspešnom sandbox nákupe, webhooku a kontrole ledgeru.
+5. Doplň aktuálne provider ceny do cost premenných. `0` znamená neznámy odhad,
+   nie bezplatné volanie. Nastav denný limit a HTTPS alert webhook.
+6. App Attest najprv nechaj `off`. Po fyzickom TestFlight teste prepnúť na
+   `observe`, skontrolovať registrácie a monotónne counters, až potom `enforce`.
+   iOS flag sa zapína až súčasne s pripraveným serverom.
+
+Admin endpointy vyžadujú header `Authorization: Bearer <ENSELORA_ADMIN_API_KEY>` a
+nesmú byť volané z aplikácie. Cost sumár používa serverové odhady v millionths of
+EUR; provider billing dashboard zostáva konečným zdrojom fakturovanej sumy.
+
+Try-On režim `best` porovná dva modely iba vtedy, keď je nastavený sekundárny model
+a `ENSELORA_TRYON_COMPARE_ENABLED=true`. Najprv over cenu, latenciu, kvalitu a
+licenciu konkrétneho modelu. Try-On je vizuálny náhľad, nie meranie veľkosti.
 
 ## 4. Aktualizácia a rollback
 

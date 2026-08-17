@@ -26,7 +26,10 @@ kvóty a samostatný Supabase projekt.
   nákladové kvóty. Nie je verejne vystavený.
 - ENSELORA používa vlastný Supabase projekt. Ďalšia aplikácia má mať nový projekt,
   vlastný prefix premenných a vlastný API namespace.
-- Gemini, Replicate a RevenueCat secrets zostávajú iba na serveri.
+- Gemini, Replicate, RevenueCat a Supabase secret keys zostávajú iba na serveri.
+- ENSELORA API zahŕňa serverový App Attest verifier, RevenueCat webhook audit,
+  kreditný ledger a pseudonymné cost udalosti/alerty. Aktivácia je krokovaná v
+  `VPS_DEPLOYMENT.md`.
 
 ## Lokálny vývoj
 
