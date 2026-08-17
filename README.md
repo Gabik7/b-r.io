@@ -24,13 +24,15 @@ kvóty a samostatný Supabase projekt.
 - Astro 7 s Node adapterom obsluhuje verzované API.
 - V produkcii Ploi/Nginx terminujú HTTPS a Ploi obnovuje Let's Encrypt
   certifikáty. Caddy zostáva iba ako alternatíva pre server bez Ploi.
-- Redis je dostupný iba na internej Docker sieti a drží rate limit, idempotenciu a
-  nákladové kvóty. Nie je verejne vystavený.
+- Redis je dostupný iba na internej Docker sieti a drží per-user/globálne/IP rate
+  limity, provider concurrency, idempotenciu a atómový denný cost breaker. Nie je
+  verejne vystavený.
 - ENSELORA používa vlastný Supabase projekt. Ďalšia aplikácia má mať nový projekt,
   vlastný prefix premenných a vlastný API namespace.
 - Gemini, Replicate, RevenueCat a Supabase secret keys zostávajú iba na serveri.
 - ENSELORA API zahŕňa serverový App Attest verifier, RevenueCat webhook audit,
-  kreditný ledger a pseudonymné cost udalosti/alerty. Aktivácia je krokovaná v
+  kreditný ledger, pseudonymné cost udalosti/alerty, obmedzené admin endpointy a
+  allowlist domén pre provider obrázky. Aktivácia je krokovaná v
   `VPS_DEPLOYMENT.md`.
 
 ## Lokálny vývoj

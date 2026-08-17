@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { authenticatedRequestIdentity, claimRemoteImageRequest, completeRemoteImageRequest, enforceRateLimit, handleApiError, imageDataUrl, json, parseJson, premiumEntitlementForUsage, readRawBody, releaseRemoteImageRequest, releaseUsage, remoteImageBase64, replicateRun, reserveUsage } from "../../../../apps/enselora/api";
+import { authenticatedRequestIdentity, claimRemoteImageRequest, completeRemoteImageRequest, enforceAIRequestLimits, enforceRateLimit, handleApiError, imageDataUrl, json, parseJson, premiumEntitlementForUsage, readRawBody, releaseRemoteImageRequest, releaseUsage, remoteImageBase64, replicateRun, reserveUsage } from "../../../../apps/enselora/api";
 import { verifyRequestAppAttest } from "../../../../apps/enselora/app-attest";
 
 export const prerender = false;
@@ -19,6 +19,7 @@ export const POST: APIRoute = async ({ request }) => {
       return json({ imageBase64: await remoteImageBase64(claim.resultURL), replayed: true });
     }
     idempotencyKey = claim.key;
+    await enforceAIRequestLimits(request, "background-removal");
     await enforceRateLimit(identity.userId, "background-removal", 20, 86_400);
     const body = parseJson<Body>(rawBody);
     const input = imageDataUrl(body.imageBase64, body.mimeType || "image/jpeg");

@@ -118,6 +118,7 @@ Povinné hodnoty:
 | `ENSELORA_GEMINI_MODEL` | `gemini-3.7-flash` |
 | `ENSELORA_REPLICATE_API_TOKEN` | Replicate token začínajúci `r8_` |
 | `ENSELORA_REPLICATE_BACKGROUND_MODEL` | úplný model a version hash z príkladu |
+| `ENSELORA_ALLOWED_REMOTE_IMAGE_HOSTS` | `replicate.delivery`; HTTPS allowlist pre výsledné obrázky |
 | `ENSELORA_REPLICATE_TRYON_MODEL_PRIMARY` | primárny Replicate Try-On model |
 | `ENSELORA_REPLICATE_TRYON_MODEL_SECONDARY` | voliteľný porovnávací model; spočiatku prázdny |
 | `ENSELORA_TRYON_COMPARE_ENABLED` | spočiatku `false` |
@@ -132,15 +133,26 @@ Povinné hodnoty:
 | `ENSELORA_APP_ATTEST_APP_ID` | `P657J6X62B.com.gabriel.enselora` |
 | `ENSELORA_APP_ATTEST_ENVIRONMENT` | pre TestFlight/produkciu `production` |
 | `ENSELORA_ADMIN_API_KEY` | nový dlhý náhodný serverový secret |
+| `ENSELORA_ADMIN_ALLOWED_IPS` | voliteľné presné IPv4/IPv6 adresy oddelené čiarkou; prázdne = bez IP obmedzenia |
+| `ENSELORA_ADMIN_RATE_LIMIT_PER_MINUTE` | `20` |
+| `ENSELORA_AUTH_RATE_LIMIT_PER_MINUTE` | `120`; IP limit pred volaním Supabase Auth |
+| `ENSELORA_GLOBAL_AI_RATE_LIMIT_PER_MINUTE` | `60` |
+| `ENSELORA_IP_AI_RATE_LIMIT_PER_MINUTE` | `15` |
+| `ENSELORA_GEMINI_MAX_CONCURRENCY` | `8` |
+| `ENSELORA_REPLICATE_MAX_CONCURRENCY` | `3` |
 | `ENSELORA_GEMINI_INPUT_MICROS_PER_MILLION` | `750000` – úvodná cena Gemini 3.7 Flash do 31. 12. 2026 |
 | `ENSELORA_GEMINI_OUTPUT_MICROS_PER_MILLION` | `3750000` – úvodná cena Gemini 3.7 Flash do 31. 12. 2026 |
-| ostatné `ENSELORA_*_COST_MICROS` | aktuálne nákladové odhady; do overenia môžu zostať `0` |
-| `ENSELORA_DAILY_COST_ALERT_MICROS` | denný limit; `0` počas úvodného merania |
+| `ENSELORA_GEMINI_REQUEST_RESERVE_COST_MICROS` | `25000`; konzervatívna rezervácia pred Gemini volaním |
+| `ENSELORA_REPLICATE_BACKGROUND_COST_MICROS` | `100000`; upraviť podľa reálneho Replicate billingu |
+| `ENSELORA_REPLICATE_TRYON_COST_MICROS` | `250000`; upraviť podľa reálneho Replicate billingu |
+| `ENSELORA_DAILY_COST_HARD_LIMIT_MICROS` | `10000000`; tvrdý denný strop, po prekročení sa AI volania zastavia |
+| `ENSELORA_DAILY_COST_ALERT_MICROS` | `8000000`; upozornenie pred tvrdým stropom |
 | `ENSELORA_COST_ALERT_WEBHOOK_URL` | voliteľný HTTPS alert webhook |
 
 `ACME_EMAIL` môže zostať vyplnený, ale pri Ploi deploymente ho používať nebudeš.
-Gemini, Replicate a RevenueCat secret nikdy nevkladaj do iOS aplikácie, Ploi UI
-viditeľného webu ani do Gitu. Do tohto súboru nepatrí Supabase service-role key.
+Gemini, Replicate a RevenueCat secret nikdy nevkladaj do iOS aplikácie, verejného
+webu ani do Gitu. Moderný Supabase `sb_secret_...` kľúč patrí iba do privátneho
+API kontajnera cez Ploi Environment; legacy service-role JWT sa nepoužíva.
 
 ### ENSELORA API kontrakt
 
@@ -178,15 +190,23 @@ nevolajú priamo z aplikácie.
 4. V App Store Connect vytvor consumable produkt
    `com.gabriel.enselora.tryon.credits10`; v RevenueCat ho namapuj na 10 kreditov.
    Klientsky flag zapni až po úspešnom sandbox nákupe, webhooku a kontrole ledgeru.
-5. Doplň aktuálne provider ceny do cost premenných. `0` znamená neznámy odhad,
-   nie bezplatné volanie. Nastav denný limit a HTTPS alert webhook.
+5. Doplň aktuálne provider ceny do cost premenných. Produkčný build odmietne
+   nulové hodnoty. Nastav tvrdý denný limit a podľa potreby HTTPS alert webhook.
 6. App Attest najprv nechaj `off`. Po fyzickom TestFlight teste prepnúť na
    `observe`, skontrolovať registrácie a monotónne counters, až potom `enforce`.
    iOS flag sa zapína až súčasne s pripraveným serverom.
 
-Admin endpointy vyžadujú header `Authorization: Bearer <ENSELORA_ADMIN_API_KEY>` a
-nesmú byť volané z aplikácie. Cost sumár používa serverové odhady v millionths of
-EUR; provider billing dashboard zostáva konečným zdrojom fakturovanej sumy.
+Admin endpointy vyžadujú header `Authorization: Bearer <ENSELORA_ADMIN_API_KEY>`,
+majú samostatný rate limit a pri vyplnenom `ENSELORA_ADMIN_ALLOWED_IPS` povoľujú
+iba uvedené presné IP adresy. Nesmú byť volané z aplikácie. Cost sumár používa
+serverové odhady v millionths of USD; provider billing dashboard zostáva konečným
+zdrojom fakturovanej sumy.
+
+AI endpointy majú súčasne per-user produktové kvóty, globálny limit, hashovaný
+per-IP limit, provider concurrency limit a atómový denný cost breaker v Redis.
+Ak Redis alebo kontrola cost limitu zlyhá, drahé provider volanie sa nevykoná.
+Výsledné AI obrázky sa načítajú iba z HTTPS domén uvedených v
+`ENSELORA_ALLOWED_REMOTE_IMAGE_HOSTS`.
 
 Try-On režim `best` porovná dva modely iba vtedy, keď je nastavený sekundárny model
 a `ENSELORA_TRYON_COMPARE_ENABLED=true`. Najprv over cenu, latenciu, kvalitu a

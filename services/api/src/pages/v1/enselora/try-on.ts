@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { ApiError, authenticatedRequestIdentity, claimTryOnRequest, completeTryOnRequest, enforceRateLimit, geminiJSON, handleApiError, imageDataUrl, json, parseJson, readRawBody, releaseTryOn, releaseTryOnRequest, remoteImageBase64, replicateRun, requirePremium, reserveTryOn } from "../../../apps/enselora/api";
+import { ApiError, authenticatedRequestIdentity, claimTryOnRequest, completeTryOnRequest, enforceAIRequestLimits, enforceRateLimit, geminiJSON, handleApiError, imageDataUrl, json, parseJson, readRawBody, releaseTryOn, releaseTryOnRequest, remoteImageBase64, replicateRun, requirePremium, reserveTryOn } from "../../../apps/enselora/api";
 import { verifyRequestAppAttest } from "../../../apps/enselora/app-attest";
 import { consumePurchasedTryOnCredit, refundPurchasedTryOnCredit } from "../../../apps/enselora/commerce";
 
@@ -19,12 +19,13 @@ export const POST: APIRoute = async ({ request }) => {
     const rawBody = await readRawBody(request);
     await verifyRequestAppAttest(request, identity.userId, rawBody);
     await requirePremium(identity.userId, "Try-On je dostupný s aktívnym ENSELORA+.");
-    await enforceRateLimit(identity.userId, "try-on", 10, 3600);
     const claim = await claimTryOnRequest(identity.userId, identity.requestId);
     if (claim.resultURL) {
       return json({ imageBase64: await remoteImageBase64(claim.resultURL), replayed: true });
     }
     idempotencyKey = claim.key;
+    await enforceAIRequestLimits(request, "try-on");
+    await enforceRateLimit(identity.userId, "try-on", 10, 3600);
     const body = parseJson<Body>(rawBody);
     const garments = Array.isArray(body.garmentImagesBase64) ? body.garmentImagesBase64.slice(0, 4) : [];
     if (!garments.length) throw new ApiError(400, "Vyber aspoň jeden kúsok oblečenia.");

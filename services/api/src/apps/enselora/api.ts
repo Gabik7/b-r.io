@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+import { isIP } from "node:net";
 import { createClient } from "redis";
 
 const JSON_HEADERS = { "Content-Type": "application/json", "Cache-Control": "no-store" };
@@ -60,6 +62,12 @@ export async function authenticatedRequestIdentity(request: Request): Promise<{ 
   if (!authorization) throw new ApiError(401, "Prihlásenie vypršalo. Otvor účet a prihlás sa znova.");
   const match = authorization.match(/^Bearer\s+(.+)$/i);
   if (!match) throw new ApiError(401, "Aplikáciu sa nepodarilo overiť.");
+  await enforceRateLimit(
+    requestClientIdentifier(request),
+    "auth-ip",
+    positiveIntegerEnv("ENSELORA_AUTH_RATE_LIMIT_PER_MINUTE", 120),
+    60,
+  );
   const supabaseURL = (process.env.ENSELORA_SUPABASE_URL || "").replace(/\/$/, "");
   const supabaseKey = process.env.ENSELORA_SUPABASE_PUBLISHABLE_KEY;
   if (!supabaseURL || !supabaseKey) throw new ApiError(503, "Overenie účtu ešte nie je nakonfigurované.");
@@ -103,45 +111,92 @@ export async function geminiJSON<T>(
   const apiKey = process.env.ENSELORA_GEMINI_API_KEY;
   const model = process.env.ENSELORA_GEMINI_MODEL || "gemini-3.7-flash";
   if (!apiKey) throw new ApiError(503, "AI služba ešte nie je nakonfigurovaná.");
+  if (!audit) throw new ApiError(503, "AI požiadavke chýba bezpečnostný audit.");
+  const { recordAIUsage, releaseAICost, reserveAICost } = await import("./usage");
+  const costReservation = await reserveAICost(
+    Number(process.env.ENSELORA_GEMINI_REQUEST_RESERVE_COST_MICROS || 0),
+    `gemini:${audit.operation}`,
+  );
+  const concurrencyKey = await acquireProviderConcurrency(
+    "gemini",
+    positiveIntegerEnv("ENSELORA_GEMINI_MAX_CONCURRENCY", 8),
+  ).catch(async (error) => {
+    await releaseAICost(costReservation);
+    throw error;
+  });
   const parts: Record<string, unknown>[] = [{ text: prompt }];
   for (const item of image ? (Array.isArray(image) ? image : [image]) : []) {
     parts.push({ inlineData: { mimeType: item.mimeType, data: item.base64 } });
   }
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts }],
-        generationConfig: { responseMimeType: "application/json" },
-      }),
-      signal: AbortSignal.timeout(60_000),
-    },
-  );
-  if (!response.ok) throw new ApiError(response.status === 429 ? 429 : 502, "AI model momentálne neodpovedá.");
-  const payload = await response.json() as any;
-  const text = payload?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (typeof text !== "string") throw new ApiError(502, "AI model vrátil neplatnú odpoveď.");
+  let costSettled = false;
   try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts }],
+          generationConfig: { responseMimeType: "application/json" },
+        }),
+        signal: AbortSignal.timeout(60_000),
+      },
+    );
+    if (!response.ok) throw new ApiError(response.status === 429 ? 429 : 502, "AI model momentálne neodpovedá.");
+    const payload = await response.json() as any;
+    const text = payload?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (typeof text !== "string") throw new ApiError(502, "AI model vrátil neplatnú odpoveď.");
+    const inputUnits = Number(payload?.usageMetadata?.promptTokenCount || 0);
+    const outputUnits = Number(payload?.usageMetadata?.candidatesTokenCount || 0);
+    const inputRate = Number(process.env.ENSELORA_GEMINI_INPUT_MICROS_PER_MILLION || 0);
+    const outputRate = Number(process.env.ENSELORA_GEMINI_OUTPUT_MICROS_PER_MILLION || 0);
+    const estimatedCostMicros = Math.max(1, Math.round((inputUnits * inputRate + outputUnits * outputRate) / 1_000_000));
+    await recordAIUsage(
+      { ...audit, provider: "gemini", model, inputUnits, outputUnits, estimatedCostMicros },
+      costReservation,
+    );
+    costSettled = true;
     const parsed = JSON.parse(text) as T;
-    if (audit) {
-      const inputUnits = Number(payload?.usageMetadata?.promptTokenCount || 0);
-      const outputUnits = Number(payload?.usageMetadata?.candidatesTokenCount || 0);
-      const inputRate = Number(process.env.ENSELORA_GEMINI_INPUT_MICROS_PER_MILLION || 0);
-      const outputRate = Number(process.env.ENSELORA_GEMINI_OUTPUT_MICROS_PER_MILLION || 0);
-      const estimatedCostMicros = Math.round((inputUnits * inputRate + outputUnits * outputRate) / 1_000_000);
-      const { recordAIUsage } = await import("./usage");
-      await recordAIUsage({ ...audit, provider: "gemini", model, inputUnits, outputUnits, estimatedCostMicros });
-    }
     return parsed;
   } catch (error) {
     if (error instanceof SyntaxError) throw new ApiError(502, "AI model vrátil neplatnú odpoveď.");
     throw error;
+  } finally {
+    if (!costSettled) await releaseAICost(costReservation);
+    await releaseProviderConcurrency(concurrencyKey);
   }
 }
 
 type Prediction = { status?: string; output?: string | string[]; error?: string; urls?: { get?: string } };
+
+function allowedRemoteImageHosts(): string[] {
+  const configured = process.env.ENSELORA_ALLOWED_REMOTE_IMAGE_HOSTS || "replicate.delivery";
+  return Array.from(new Set(configured
+    .split(",")
+    .map((item) => item.trim().toLowerCase().replace(/^\.+|\.+$/g, ""))
+    .filter(Boolean)));
+}
+
+export function safeProviderURL(value: string, allowedHosts = allowedRemoteImageHosts()): string {
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    throw new ApiError(502, "Obrazový model vrátil neplatnú adresu výsledku.");
+  }
+  const hostname = url.hostname.toLowerCase().replace(/\.$/, "");
+  const allowed = allowedHosts.some((host) => hostname === host || hostname.endsWith(`.${host}`));
+  if (
+    url.protocol !== "https:"
+    || Boolean(url.username || url.password)
+    || (url.port && url.port !== "443")
+    || isIP(hostname) !== 0
+    || !allowed
+  ) {
+    throw new ApiError(502, "Obrazový model vrátil nepovolenú adresu výsledku.");
+  }
+  return url.toString();
+}
 
 export async function replicateRun(
   model: string,
@@ -151,49 +206,103 @@ export async function replicateRun(
 ): Promise<string> {
   const token = process.env.ENSELORA_REPLICATE_API_TOKEN;
   if (!token) throw new ApiError(503, "Obrazová služba ešte nie je nakonfigurovaná.");
+  if (!audit) throw new ApiError(503, "Obrazovej požiadavke chýba bezpečnostný audit.");
+  const { recordAIUsage, releaseAICost, reserveAICost } = await import("./usage");
+  const costReservation = await reserveAICost(audit.estimatedCostMicros, `replicate:${audit.operation}`);
+  const concurrencyKey = await acquireProviderConcurrency(
+    "replicate",
+    positiveIntegerEnv("ENSELORA_REPLICATE_MAX_CONCURRENCY", 3),
+  ).catch(async (error) => {
+    await releaseAICost(costReservation);
+    throw error;
+  });
   const url = official
     ? `https://api.replicate.com/v1/models/${model}/predictions`
     : "https://api.replicate.com/v1/predictions";
   const body = official ? { input } : { version: model, input };
-  let response = await fetch(url, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-      Prefer: "wait=55",
-      "Cancel-After": "90s",
-    },
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout(60_000),
-  });
-  if (!response.ok) throw new ApiError(response.status === 429 ? 429 : 502, "Obrazový model momentálne neodpovedá.");
-  let prediction = await response.json() as Prediction;
-  for (let attempt = 0; !["succeeded", "failed", "canceled"].includes(prediction.status || "") && attempt < 20; attempt++) {
-    if (!prediction.urls?.get) break;
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    response = await fetch(prediction.urls.get, { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(10_000) });
-    prediction = await response.json() as Prediction;
+  let costSettled = false;
+  try {
+    let response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Prefer: "wait=55",
+        "Cancel-After": "90s",
+      },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(60_000),
+    });
+    if (!response.ok) throw new ApiError(response.status === 429 ? 429 : 502, "Obrazový model momentálne neodpovedá.");
+    let prediction = await response.json() as Prediction;
+    for (let attempt = 0; !["succeeded", "failed", "canceled"].includes(prediction.status || "") && attempt < 20; attempt++) {
+      if (!prediction.urls?.get) break;
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const pollingURL = safeProviderURL(prediction.urls.get, ["api.replicate.com"]);
+      response = await fetch(pollingURL, { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(10_000) });
+      if (!response.ok) {
+        throw new ApiError(response.status === 429 ? 429 : 502, "Obrazový model momentálne neodpovedá.");
+      }
+      prediction = await response.json() as Prediction;
+    }
+    if (prediction.status !== "succeeded") throw new ApiError(504, "Generovanie trvalo príliš dlho. Skús to znova.");
+    const output = Array.isArray(prediction.output) ? prediction.output[0] : prediction.output;
+    if (!output) throw new ApiError(502, "Obrazový model vrátil neplatný výsledok.");
+    const resultURL = safeProviderURL(output);
+    await recordAIUsage({ ...audit, provider: "replicate", model }, costReservation);
+    costSettled = true;
+    return resultURL;
+  } finally {
+    if (!costSettled) await releaseAICost(costReservation);
+    await releaseProviderConcurrency(concurrencyKey);
   }
-  if (prediction.status !== "succeeded") throw new ApiError(504, "Generovanie trvalo príliš dlho. Skús to znova.");
-  const output = Array.isArray(prediction.output) ? prediction.output[0] : prediction.output;
-  if (!output || !/^https:\/\//.test(output)) throw new ApiError(502, "Obrazový model vrátil neplatný výsledok.");
-  if (audit) {
-    const { recordAIUsage } = await import("./usage");
-    await recordAIUsage({ ...audit, provider: "replicate", model });
-  }
-  return output;
 }
 
 export async function remoteImageBase64(url: string): Promise<string> {
-  const response = await fetch(url, { signal: AbortSignal.timeout(20_000) });
+  const response = await fetch(safeProviderURL(url), { signal: AbortSignal.timeout(20_000) });
   if (!response.ok) throw new ApiError(502, "Výsledný obrázok sa nepodarilo načítať.");
+  const contentLength = Number(response.headers.get("content-length") || 0);
+  if (Number.isFinite(contentLength) && contentLength > 12 * 1024 * 1024) {
+    throw new ApiError(502, "Výsledný obrázok má neplatnú veľkosť.");
+  }
+  const contentType = (response.headers.get("content-type") || "").split(";", 1)[0].trim().toLowerCase();
   const bytes = new Uint8Array(await response.arrayBuffer());
   if (!bytes.length || bytes.length > 12 * 1024 * 1024) throw new ApiError(502, "Výsledný obrázok má neplatnú veľkosť.");
+  const detectedType = detectedImageMimeType(bytes);
+  const declaredTypes = ["image/jpeg", "image/png", "image/webp"];
+  if (
+    !detectedType
+    || (contentType && contentType !== "application/octet-stream" && !declaredTypes.includes(contentType))
+    || (declaredTypes.includes(contentType) && contentType !== detectedType)
+  ) {
+    throw new ApiError(502, "Výsledný súbor nie je podporovaný obrázok.");
+  }
   let binary = "";
   for (let offset = 0; offset < bytes.length; offset += 0x8000) {
     binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000));
   }
   return btoa(binary);
+}
+
+export function detectedImageMimeType(bytes: Uint8Array): "image/jpeg" | "image/png" | "image/webp" | undefined {
+  if (bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return "image/jpeg";
+  if (
+    bytes.length >= 8
+    && bytes[0] === 0x89
+    && bytes[1] === 0x50
+    && bytes[2] === 0x4e
+    && bytes[3] === 0x47
+    && bytes[4] === 0x0d
+    && bytes[5] === 0x0a
+    && bytes[6] === 0x1a
+    && bytes[7] === 0x0a
+  ) return "image/png";
+  if (
+    bytes.length >= 12
+    && String.fromCharCode(...bytes.subarray(0, 4)) === "RIFF"
+    && String.fromCharCode(...bytes.subarray(8, 12)) === "WEBP"
+  ) return "image/webp";
+  return undefined;
 }
 
 type CachedEntitlement = { isPremium: boolean; expiresAt: number };
@@ -279,6 +388,20 @@ async function redisPipeline(commands: unknown[][]): Promise<Array<{ result: unk
 
 export async function redisCommands(commands: unknown[][]): Promise<Array<{ result: unknown }>> {
   return redisPipeline(commands);
+}
+
+export async function redisEval(
+  script: string,
+  keys: string[],
+  args: Array<string | number>,
+): Promise<unknown> {
+  try {
+    const client = await connectedRedis();
+    return await client.eval(script, { keys, arguments: args.map(String) });
+  } catch (error) {
+    console.error("GFCodes Redis script failed", { message: error instanceof Error ? error.message : "unknown" });
+    throw new ApiError(503, "Kvótu sa nepodarilo overiť.");
+  }
 }
 
 export async function redisIsReady(): Promise<boolean> {
@@ -379,8 +502,8 @@ export async function completeTryOnRequest(key: string, resultURL: string): Prom
 }
 
 export async function completeRemoteImageRequest(key: string, resultURL: string): Promise<void> {
-  if (!/^https:\/\//.test(resultURL)) throw new ApiError(502, "Výsledný obrázok má neplatnú adresu.");
-  await redisPipeline([["SET", key, `done:${resultURL}`, "EX", 900]]);
+  const safeResultURL = safeProviderURL(resultURL);
+  await redisPipeline([["SET", key, `done:${safeResultURL}`, "EX", 900]]);
 }
 
 export async function releaseTryOnRequest(key: string): Promise<void> {
@@ -439,4 +562,73 @@ export async function enforceRateLimit(
   const count = Number(results?.[0]?.result);
   if (!Number.isFinite(count)) throw new ApiError(503, "Limit sa nepodarilo overiť.");
   if (count > limit) throw new ApiError(429, "Príliš veľa požiadaviek. Skús to neskôr.");
+}
+
+function positiveIntegerEnv(name: string, fallback: number): number {
+  const value = Number(process.env[name] || fallback);
+  return Number.isInteger(value) && value > 0 ? value : fallback;
+}
+
+function normalizedIPAddress(value: string | null): string | undefined {
+  const candidate = (value || "").trim().replace(/^\[|\]$/g, "").replace(/^::ffff:/i, "");
+  return isIP(candidate) ? candidate : undefined;
+}
+
+export function requestIPAddress(request: Request): string | undefined {
+  const realIP = normalizedIPAddress(request.headers.get("x-real-ip"));
+  if (realIP) return realIP;
+  for (const value of (request.headers.get("x-forwarded-for") || "").split(",")) {
+    const forwardedIP = normalizedIPAddress(value);
+    if (forwardedIP) return forwardedIP;
+  }
+  return undefined;
+}
+
+export function requestClientIdentifier(request: Request): string {
+  const address = requestIPAddress(request) || "unknown";
+  return createHash("sha256").update(address).digest("hex").slice(0, 32);
+}
+
+export async function enforceAIRequestLimits(request: Request, operation: string): Promise<void> {
+  const client = requestClientIdentifier(request);
+  await enforceRateLimit(
+    "global",
+    "ai-global",
+    positiveIntegerEnv("ENSELORA_GLOBAL_AI_RATE_LIMIT_PER_MINUTE", 60),
+    60,
+  );
+  await enforceRateLimit(
+    client,
+    `ai-ip:${operation}`,
+    positiveIntegerEnv("ENSELORA_IP_AI_RATE_LIMIT_PER_MINUTE", 15),
+    60,
+  );
+}
+
+async function acquireProviderConcurrency(provider: string, limit: number): Promise<string> {
+  const key = `enselora:concurrency:${provider}`;
+  const script = `
+    local count = redis.call('INCR', KEYS[1])
+    redis.call('EXPIRE', KEYS[1], ARGV[2])
+    if count > tonumber(ARGV[1]) then
+      redis.call('DECR', KEYS[1])
+      return 0
+    end
+    return 1
+  `;
+  const acquired = Number(await redisEval(script, [key], [limit, 600]));
+  if (acquired !== 1) throw new ApiError(429, "AI služba je vyťažená. Skús to o chvíľu.");
+  return key;
+}
+
+async function releaseProviderConcurrency(key: string): Promise<void> {
+  const script = `
+    local current = tonumber(redis.call('GET', KEYS[1]) or '0')
+    if current <= 1 then
+      redis.call('DEL', KEYS[1])
+      return 0
+    end
+    return redis.call('DECR', KEYS[1])
+  `;
+  try { await redisEval(script, [key], []); } catch { /* TTL remains a crash-safe fallback */ }
 }

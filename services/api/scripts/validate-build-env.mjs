@@ -1,11 +1,25 @@
+import { isIP } from "node:net";
+
 const required = [
   "API_PUBLIC_URL",
   "REDIS_URL",
   "ENSELORA_GEMINI_API_KEY",
   "ENSELORA_REPLICATE_API_TOKEN",
+  "ENSELORA_REPLICATE_BACKGROUND_MODEL",
   "ENSELORA_REVENUECAT_SECRET_API_KEY",
+  "ENSELORA_REVENUECAT_WEBHOOK_AUTHORIZATION",
+  "ENSELORA_REVENUECAT_WEBHOOK_SIGNING_SECRET",
   "ENSELORA_SUPABASE_URL",
   "ENSELORA_SUPABASE_PUBLISHABLE_KEY",
+  "ENSELORA_SUPABASE_SECRET_KEY",
+  "ENSELORA_ADMIN_API_KEY",
+  "ENSELORA_GEMINI_INPUT_MICROS_PER_MILLION",
+  "ENSELORA_GEMINI_OUTPUT_MICROS_PER_MILLION",
+  "ENSELORA_GEMINI_REQUEST_RESERVE_COST_MICROS",
+  "ENSELORA_REPLICATE_BACKGROUND_COST_MICROS",
+  "ENSELORA_REPLICATE_TRYON_COST_MICROS",
+  "ENSELORA_DAILY_COST_HARD_LIMIT_MICROS",
+  "ENSELORA_AUTH_RATE_LIMIT_PER_MINUTE",
 ];
 
 const missing = required.filter((key) => !process.env[key]?.trim());
@@ -47,4 +61,49 @@ if (!process.env.ENSELORA_REVENUECAT_SECRET_API_KEY.startsWith("sk_")) {
 if (!process.env.ENSELORA_REPLICATE_API_TOKEN.startsWith("r8_")) {
   console.error("ENSELORA_REPLICATE_API_TOKEN must be a Replicate API token (r8_...).");
   process.exit(1);
+}
+
+for (const key of [
+  "ENSELORA_GEMINI_INPUT_MICROS_PER_MILLION",
+  "ENSELORA_GEMINI_OUTPUT_MICROS_PER_MILLION",
+  "ENSELORA_GEMINI_REQUEST_RESERVE_COST_MICROS",
+  "ENSELORA_REPLICATE_BACKGROUND_COST_MICROS",
+  "ENSELORA_REPLICATE_TRYON_COST_MICROS",
+  "ENSELORA_DAILY_COST_HARD_LIMIT_MICROS",
+]) {
+  const value = Number(process.env[key]);
+  if (!Number.isSafeInteger(value) || value <= 0) {
+    console.error(`${key} must be a positive integer expressed in millionths of USD.`);
+    process.exit(1);
+  }
+}
+
+for (const key of [
+  "ENSELORA_GLOBAL_AI_RATE_LIMIT_PER_MINUTE",
+  "ENSELORA_IP_AI_RATE_LIMIT_PER_MINUTE",
+  "ENSELORA_GEMINI_MAX_CONCURRENCY",
+  "ENSELORA_REPLICATE_MAX_CONCURRENCY",
+  "ENSELORA_ADMIN_RATE_LIMIT_PER_MINUTE",
+  "ENSELORA_AUTH_RATE_LIMIT_PER_MINUTE",
+]) {
+  if (!process.env[key]) continue;
+  const value = Number(process.env[key]);
+  if (!Number.isSafeInteger(value) || value <= 0) {
+    console.error(`${key} must be a positive integer.`);
+    process.exit(1);
+  }
+}
+
+for (const address of (process.env.ENSELORA_ADMIN_ALLOWED_IPS || "").split(",").map((item) => item.trim()).filter(Boolean)) {
+  if (isIP(address.replace(/^::ffff:/i, "")) === 0) {
+    console.error("ENSELORA_ADMIN_ALLOWED_IPS must contain only exact IPv4/IPv6 addresses.");
+    process.exit(1);
+  }
+}
+
+for (const hostname of (process.env.ENSELORA_ALLOWED_REMOTE_IMAGE_HOSTS || "replicate.delivery").split(",").map((item) => item.trim()).filter(Boolean)) {
+  if (isIP(hostname) !== 0 || !/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)*[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i.test(hostname)) {
+    console.error("ENSELORA_ALLOWED_REMOTE_IMAGE_HOSTS must contain only DNS hostnames.");
+    process.exit(1);
+  }
 }

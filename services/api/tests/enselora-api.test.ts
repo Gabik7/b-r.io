@@ -1,10 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import { createHmac } from "node:crypto";
-import { ApiError, authenticatedRequestIdentity, imageDataUrl, premiumEntitlementForUsage, rateLimitKey, requestIdentity, responseLanguage, tryOnQuotaKey, usageQuotaKey } from "../src/apps/enselora/api";
+import { ApiError, authenticatedRequestIdentity, detectedImageMimeType, imageDataUrl, premiumEntitlementForUsage, rateLimitKey, requestClientIdentifier, requestIPAddress, requestIdentity, responseLanguage, safeProviderURL, tryOnQuotaKey, usageQuotaKey } from "../src/apps/enselora/api";
 import { constantTimeSecretMatch } from "../src/apps/enselora/app-attest";
 import { revenueCatEventUserId, webhookAuthorized } from "../src/apps/enselora/commerce";
 import { runtimeConfigStatus } from "../src/apps/enselora/config";
 import { supabaseAdminHeaders } from "../src/apps/enselora/supabase-admin";
+import { adminAllowedIPs } from "../src/apps/enselora/security";
 
 describe("ENSELORA API validation", () => {
   test("accepts a bounded JPEG base64 image", () => {
@@ -42,6 +43,40 @@ describe("ENSELORA API validation", () => {
   test("builds deterministic rate-limit buckets", () => {
     expect(rateLimitKey("user-1", "analysis", 3600, Date.parse("2026-08-15T12:30:00Z")))
       .toBe(rateLimitKey("user-1", "analysis", 3600, Date.parse("2026-08-15T12:59:59Z")));
+  });
+
+  test("uses the normalized proxy IP without exposing it in Redis identifiers", () => {
+    const request = new Request("https://example.com", {
+      headers: {
+        "x-real-ip": "::ffff:203.0.113.9",
+        "x-forwarded-for": "198.51.100.4, 10.0.0.1",
+      },
+    });
+    expect(requestIPAddress(request)).toBe("203.0.113.9");
+    expect(requestClientIdentifier(request)).toMatch(/^[a-f0-9]{32}$/);
+    expect(requestClientIdentifier(request)).not.toContain("203.0.113.9");
+  });
+
+  test("rejects provider URLs outside the explicit HTTPS allowlist", () => {
+    expect(safeProviderURL("https://replicate.delivery/output.png"))
+      .toBe("https://replicate.delivery/output.png");
+    expect(safeProviderURL("https://pbxt.replicate.delivery/output.png"))
+      .toBe("https://pbxt.replicate.delivery/output.png");
+    expect(() => safeProviderURL("http://replicate.delivery/output.png")).toThrow(ApiError);
+    expect(() => safeProviderURL("https://127.0.0.1/output.png")).toThrow(ApiError);
+    expect(() => safeProviderURL("https://replicate.delivery.example.com/output.png")).toThrow(ApiError);
+  });
+
+  test("accepts only real JPEG, PNG and WebP provider payloads", () => {
+    expect(detectedImageMimeType(new Uint8Array([0xff, 0xd8, 0xff, 0x00]))).toBe("image/jpeg");
+    expect(detectedImageMimeType(new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))).toBe("image/png");
+    expect(detectedImageMimeType(new TextEncoder().encode("RIFF0000WEBP"))).toBe("image/webp");
+    expect(detectedImageMimeType(new TextEncoder().encode("<svg></svg>"))).toBeUndefined();
+  });
+
+  test("normalizes and deduplicates exact admin IP allowlists", () => {
+    expect(adminAllowedIPs("203.0.113.9, ::ffff:203.0.113.9, 2001:db8::1, invalid"))
+      .toEqual(["203.0.113.9", "2001:db8::1"]);
   });
 
   test("builds isolated daily and monthly usage quota keys", () => {
