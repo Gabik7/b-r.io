@@ -3,6 +3,7 @@ import { isIP } from "node:net";
 const required = [
   "API_PUBLIC_URL",
   "REDIS_URL",
+  "SETLYVO_API_UPSTREAM_URL",
   "ENSELORA_GEMINI_API_KEY",
   "ENSELORA_REPLICATE_API_TOKEN",
   "ENSELORA_REPLICATE_BACKGROUND_MODEL",
@@ -43,6 +44,16 @@ for (const key of ["API_PUBLIC_URL", "ENSELORA_SUPABASE_URL"]) {
     console.error(`${key} must be a valid HTTPS URL.`);
     process.exit(1);
   }
+}
+
+try {
+  const setlyvoURL = new URL(process.env.SETLYVO_API_UPSTREAM_URL);
+  if (!["http:", "https:"].includes(setlyvoURL.protocol) || !setlyvoURL.pathname.endsWith("/api/v1/")) {
+    throw new Error("Setlyvo Laravel v1 base URL is required");
+  }
+} catch {
+  console.error("SETLYVO_API_UPSTREAM_URL must be an http(s) URL ending in /api/v1/.");
+  process.exit(1);
 }
 
 try {

@@ -13,7 +13,8 @@ internet
           └─ Ploi / Nginx / Let's Encrypt (80, 443)
               ├─ gfcodes.com       → 127.0.0.1:3000 → Next.js web
               └─ api.gfcodes.com   → 127.0.0.1:4321 → Astro API
-                                          └─ interná Docker sieť → Redis
+                                          ├─ interná Docker sieť → Redis
+                                          └─ /v1/setlyvo/* → loopback-only Laravel :8080
 ```
 
 Porty `3000`, `4321` a `6379` nesmú byť verejne otvorené. Ploi override ich
@@ -114,6 +115,7 @@ Povinné hodnoty:
 | `SITE_DOMAIN` | `gfcodes.com` |
 | `API_DOMAIN` | `api.gfcodes.com` |
 | `REDIS_PASSWORD` | nový náhodný reťazec; vytvor cez `openssl rand -base64 48` |
+| `SETLYVO_API_UPSTREAM_URL` | interná Laravel v1 URL dostupná z API kontajnera, odporúčané `http://host.docker.internal:8080/api/v1/` |
 | `ENSELORA_GEMINI_API_KEY` | Google AI Studio / Gemini server key |
 | `ENSELORA_GEMINI_MODEL` | `gemini-3.7-flash` |
 | `ENSELORA_REPLICATE_API_TOKEN` | Replicate token začínajúci `r8_` |
@@ -153,6 +155,25 @@ Povinné hodnoty:
 Gemini, Replicate a RevenueCat secret nikdy nevkladaj do iOS aplikácie, verejného
 webu ani do Gitu. Moderný Supabase `sb_secret_...` kľúč patrí iba do privátneho
 API kontajnera cez Ploi Environment; legacy service-role JWT sa nepoužíva.
+
+### Setlyvo API brána
+
+Setlyvo iOS volá `https://api.gfcodes.com/v1/setlyvo/`. Astro endpoint preposiela
+metódu, query, JSON telo, bearer token a iba potrebné proxy hlavičky do samostatnej
+Laravel aplikácie. Laravel musí na VPS počúvať iba na loopback porte (odporúčane
+`127.0.0.1:8080`) a mať vlastnú PostgreSQL databázu, `APP_KEY`, `APPLE_CLIENT_ID`
+a aplikované migrácie. Port 8080 sa nesmie otvoriť vo firewalle.
+
+Linux Docker mapovanie `host.docker.internal:host-gateway` je už v Compose. Pred
+nasadením GFCodes obrazu over z API kontajnera aj cez verejnú TLS bránu:
+
+```sh
+docker compose exec api wget -qO- http://host.docker.internal:8080/api/v1/health
+curl --fail https://api.gfcodes.com/v1/setlyvo/health
+```
+
+Oba príkazy musia vrátiť Setlyvo Laravel health payload. Interná upstream URL sa
+nikdy nevkladá do iOS; aplikácia pozná iba verejný GFCodes namespace.
 
 ### ENSELORA API kontrakt
 

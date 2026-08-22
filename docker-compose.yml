@@ -59,6 +59,7 @@ services:
     environment:
       API_PUBLIC_URL: https://${API_DOMAIN}
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      SETLYVO_API_UPSTREAM_URL: ${SETLYVO_API_UPSTREAM_URL}
       ENSELORA_GEMINI_API_KEY: ${ENSELORA_GEMINI_API_KEY}
       ENSELORA_GEMINI_MODEL: ${ENSELORA_GEMINI_MODEL:-gemini-3.7-flash}
       ENSELORA_REPLICATE_API_TOKEN: ${ENSELORA_REPLICATE_API_TOKEN}
@@ -93,6 +94,8 @@ services:
       ENSELORA_DAILY_COST_HARD_LIMIT_MICROS: ${ENSELORA_DAILY_COST_HARD_LIMIT_MICROS:-10000000}
       ENSELORA_DAILY_COST_ALERT_MICROS: ${ENSELORA_DAILY_COST_ALERT_MICROS:-8000000}
       ENSELORA_COST_ALERT_WEBHOOK_URL: ${ENSELORA_COST_ALERT_WEBHOOK_URL:-}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:4321/health"]
       interval: 30s
