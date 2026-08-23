@@ -2,6 +2,7 @@ import { isIP } from "node:net";
 
 const FORWARDED_REQUEST_HEADERS = [
   "accept",
+  "accept-language",
   "authorization",
   "content-type",
   "x-request-id",
@@ -71,7 +72,7 @@ export async function buildSetlyvoUpstreamRequest(request: Request, path: string
     headers,
     body,
     redirect: "manual",
-    signal: AbortSignal.timeout(30_000),
+    signal: AbortSignal.timeout(120_000),
   });
 }
 

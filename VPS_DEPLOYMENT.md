@@ -161,8 +161,11 @@ API kontajnera cez Ploi Environment; legacy service-role JWT sa nepoužíva.
 Setlyvo iOS volá `https://api.gfcodes.com/v1/setlyvo/`. Astro endpoint preposiela
 metódu, query, JSON telo, bearer token a iba potrebné proxy hlavičky do samostatnej
 Laravel aplikácie. Laravel musí na VPS počúvať iba na loopback porte (odporúčane
-`127.0.0.1:8080`) a mať vlastnú PostgreSQL databázu, `APP_KEY`, `APPLE_CLIENT_ID`
-a aplikované migrácie. Port 8080 sa nesmie otvoriť vo firewalle.
+`127.0.0.1:8080`) a mať vlastnú PostgreSQL databázu, stabilný `APP_KEY`,
+`APPLE_CLIENT_ID`, `APPLE_TEAM_ID`, `APPLE_KEY_ID`, read-only
+`APPLE_PRIVATE_KEY_PATH` a aplikované migrácie. `APP_KEY` je zároveň potrebný na
+dešifrovanie Apple refresh tokenov pri zrušení účtu, preto sa nesmie po nasadení
+náhodne meniť. Port 8080 sa nesmie otvoriť vo firewalle.
 
 Linux Docker mapovanie `host.docker.internal:host-gateway` je už v Compose. Pred
 nasadením GFCodes obrazu over z API kontajnera aj cez verejnú TLS bránu:
@@ -309,7 +312,9 @@ location / {
 }
 ```
 
-Pre API použi port 4321 a navyše veľkosť a timeout potrebný pre obrázky a Try-On:
+Pre API použi port 4321 a navyše veľkosť a timeout potrebný pre obrázky, Try-On
+a Setlyvo Full Gym Scan. Setlyvo Laravel prijíma najviac 12 spracovaných snímok
+po 2 MiB, takže 32 MiB limit pokrýva aj multipart obálku:
 
 ```nginx
 client_max_body_size 32m;

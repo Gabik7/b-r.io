@@ -27,6 +27,7 @@ describe("Setlyvo API gateway", () => {
         headers: {
           authorization: "Bearer opaque-token",
           "content-type": "application/json",
+          "accept-language": "sk-SK,sk;q=0.9",
           cookie: "must-not-forward=true",
           "x-real-ip": "::ffff:203.0.113.9",
           "x-forwarded-for": "198.51.100.5",
@@ -37,6 +38,7 @@ describe("Setlyvo API gateway", () => {
 
     expect(upstream.url).toBe("http://setlyvo-api:8080/api/v1/gyms");
     expect(upstream.headers.get("authorization")).toBe("Bearer opaque-token");
+    expect(upstream.headers.get("accept-language")).toBe("sk-SK,sk;q=0.9");
     expect(upstream.headers.get("cookie")).toBeNull();
     expect(upstream.headers.get("x-real-ip")).toBe("203.0.113.9");
     expect(upstream.headers.get("x-forwarded-for")).toBe("203.0.113.9");
