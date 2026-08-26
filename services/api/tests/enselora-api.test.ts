@@ -6,8 +6,23 @@ import { revenueCatEventUserId, webhookAuthorized } from "../src/apps/enselora/c
 import { runtimeConfigStatus } from "../src/apps/enselora/config";
 import { supabaseAdminHeaders } from "../src/apps/enselora/supabase-admin";
 import { adminAllowedIPs } from "../src/apps/enselora/security";
+import { sanitizedGarmentPairings } from "../src/apps/enselora/styling-signals";
 
 describe("ENSELORA API validation", () => {
+  test("keeps only bounded, distinct wardrobe pairings for stylist learning", () => {
+    const allowed = new Set(["shirt", "trousers", "shoes"]);
+
+    expect(sanitizedGarmentPairings([
+      ["shirt", "trousers", "unknown"],
+      ["shirt", "shirt"],
+      "not-a-pair",
+      ["shoes", "trousers"],
+    ], allowed)).toEqual([
+      ["shirt", "trousers"],
+      ["shoes", "trousers"],
+    ]);
+  });
+
   test("accepts a bounded JPEG base64 image", () => {
     expect(imageDataUrl("aGVsbG8=", "image/jpeg")).toBe("data:image/jpeg;base64,aGVsbG8=");
   });

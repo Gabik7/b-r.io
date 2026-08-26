@@ -1,13 +1,14 @@
 import type { APIRoute } from "astro";
 import { ApiError, authenticatedRequestIdentity, claimJSONRequest, completeJSONRequest, enforceAIRequestLimits, enforceRateLimit, geminiJSON, handleApiError, json, parseJson, premiumEntitlementForUsage, readRawBody, releaseJSONRequest, releaseUsage, reserveUsage, responseLanguage } from "../../../../apps/enselora/api";
 import { verifyRequestAppAttest } from "../../../../apps/enselora/app-attest";
+import { sanitizedGarmentPairings } from "../../../../apps/enselora/styling-signals";
 
 export const prerender = false;
 type Garment = { id: string; name: string; category: string; colorName: string; season: string; wearCount: number; material?: string; pattern?: string };
 type Body = {
   wardrobe?: Garment[];
   context?: { temperature?: number; weatherSymbol?: string; occasions?: string[] };
-  signals?: { preferredGarmentIDs?: string[]; avoidedGarmentIDs?: string[]; rejectionReasons?: string[]; preferredColors?: string[]; preferredCategories?: string[]; provenPairings?: string[][] };
+  signals?: { preferredGarmentIDs?: string[]; avoidedGarmentIDs?: string[]; avoidedPairings?: string[][]; rejectionReasons?: string[]; preferredColors?: string[]; preferredCategories?: string[]; provenPairings?: string[][] };
   count?: number;
   locale?: string;
 };
@@ -36,10 +37,11 @@ export const POST: APIRoute = async ({ request }) => {
     const signals = {
       preferredGarmentIDs: (body.signals?.preferredGarmentIDs || []).filter((id) => ids.has(id)).slice(0, 30),
       avoidedGarmentIDs: (body.signals?.avoidedGarmentIDs || []).filter((id) => ids.has(id)).slice(0, 30),
+      avoidedPairings: sanitizedGarmentPairings(body.signals?.avoidedPairings, ids),
       rejectionReasons: (body.signals?.rejectionReasons || []).map((item) => String(item).slice(0, 80)).slice(0, 10),
       preferredColors: (body.signals?.preferredColors || []).map((item) => String(item).slice(0, 40)).slice(0, 5),
       preferredCategories: (body.signals?.preferredCategories || []).map((item) => String(item).slice(0, 40)).slice(0, 5),
-      provenPairings: (body.signals?.provenPairings || []).map((pair) => pair.filter((id) => ids.has(id)).slice(0, 2)).filter((pair) => pair.length === 2).slice(0, 12),
+      provenPairings: sanitizedGarmentPairings(body.signals?.provenPairings, ids),
     };
     const requestedCount = Math.min(3, Math.max(1, Math.round(Number(body.count) || 1)));
     const isPremium = await premiumEntitlementForUsage(identity.userId);
