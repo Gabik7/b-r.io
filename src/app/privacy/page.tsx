@@ -205,8 +205,9 @@ export default function PrivacyPage() {
         <p>
           Odovzdaj does not require an account. Addresses, unit details,
           participant names, handover dates, room conditions, notes, meter
-          readings, key counts, signatures, and completed-protocol history are
-          stored locally on the user&apos;s iPhone.
+          readings, key counts, contact details, witness details, company
+          branding, signatures, evidence annotations, integrity hashes, and
+          completed-protocol history are stored locally on the user&apos;s iPhone.
         </p>
         <p>
           Photos selected from the photo library or taken with the camera are
@@ -234,6 +235,26 @@ export default function PrivacyPage() {
           creation continues to work without signing in.
         </p>
 
+        <h3>Optional remote approval</h3>
+        <p>
+          The annual Odovzdaj Pro plan may let a signed-in user create a
+          time-limited approval request for a backed-up protocol. Supabase stores
+          the account owner, protocol identifier, expected signer name, signer
+          role, request status, expiry and response timestamps, the responding
+          name, and—only after approval—the supplied signature image in private
+          storage. The random approval token is shown only to the owner; only its
+          SHA-256 hash is stored by the service.
+        </p>
+        <p>
+          The approval link displays only the protocol number. It does not expose
+          the PDF, property address, photographs, or other protocol contents.
+          The owner must provide the PDF separately to the intended recipient.
+          Anyone who receives the unexpired link can submit a decision, so users
+          must share it only with the intended person. A link expires after no
+          more than seven days, becomes unusable after a response, and may be
+          cancelled by the account owner.
+        </p>
+
         <h3>Purchases, analytics, and tracking</h3>
         <p>
           Apple processes Odovzdaj purchases through the App Store and provides
@@ -245,8 +266,10 @@ export default function PrivacyPage() {
 
         <h3>Permissions, retention, and deletion</h3>
         <p>
-          Camera and photo-library access are used only to attach photos to a
-          protocol. Denying either permission does not prevent use of the
+          Camera and photo-library access are used only to attach photos, scan a
+          meter display on-device with Apple Vision, or select a company logo.
+          The system contact picker shares only the contact explicitly selected
+          by the user. Denying optional access does not prevent use of the
           remaining protocol features. A completed record and its PDF can be
           deleted from the app. Individual cloud backups and the complete cloud
           account can also be deleted in the Pro Cloud screen. Signing out or
@@ -262,7 +285,7 @@ export default function PrivacyPage() {
           with Apple, and operating-system features such as the camera, photo
           library, local storage, and share sheet. Supabase provides optional
           account, database, Edge Function, and private PDF-storage services for
-          Odovzdaj Pro Cloud.
+          Odovzdaj Pro Cloud, including private remote-approval signatures.
         </p>
         <p>
           Depending on the selected ENSELORA feature, service providers may
@@ -312,8 +335,9 @@ export default function PrivacyPage() {
           Odovzdaj lets users delete individual completed records and local PDF
           files. Photos can be removed while a protocol is being prepared. Pro
           Cloud users can restore a backed-up PDF, delete individual backups,
-          sign out, or permanently delete the cloud account and all its backups
-          in the app. Local-only content cannot be remotely accessed, corrected,
+          cancel approval links, sign out, or permanently delete the cloud
+          account, its backups, approval records, and stored remote signatures in
+          the app. Local-only content cannot be remotely accessed, corrected,
           exported, or restored by Gabriel Falis.
         </p>
         <p>

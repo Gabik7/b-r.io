@@ -29,6 +29,10 @@ const topics = [
     title: 'Privacy or account request',
     body: 'Email me to ask about your information, request an export or deletion, or withdraw an optional consent.',
   },
+  {
+    title: 'Odovzdaj approval link',
+    body: 'Include only the protocol number and link status. Do not email a private protocol PDF unless it is necessary and safe to do so.',
+  },
 ]
 
 export default function SupportPage() {
@@ -103,7 +107,7 @@ export default function SupportPage() {
 
         <section className="py-14 lg:py-20">
           <h2 className="text-lg font-medium">What to include</h2>
-          <div className="mt-10 grid border-y border-ink/12 md:grid-cols-3">
+          <div className="mt-10 grid border-y border-ink/12 md:grid-cols-2 lg:grid-cols-4">
             {topics.map((topic, index) => (
               <article
                 key={topic.title}

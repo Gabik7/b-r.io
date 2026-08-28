@@ -190,10 +190,13 @@ export default function TermsPage() {
         <p>
           Users are responsible for checking every entry before signing or
           sharing a protocol, obtaining permission to photograph the property
-          and process participant information, and keeping any backup required
-          for their tenancy or legal needs. A finger-drawn signature records the
-          drawing supplied on the device; it is not represented as a qualified
-          electronic signature or independent proof of identity.
+          and process participant, contact, witness, and branding information,
+          and keeping any backup required for their tenancy or legal needs. A
+          finger-drawn or remotely supplied signature records the drawing and
+          name supplied by that person; it is not represented as a qualified
+          electronic signature or independent proof of identity. Integrity
+          hashes can help detect changed input data but do not independently
+          prove identity, ownership, time, or legal validity.
         </p>
 
         <h3>Local files, optional cloud, and sharing</h3>
@@ -213,12 +216,26 @@ export default function TermsPage() {
           cloud data. Account deletion and cancellation are separate actions.
         </p>
 
+        <h3>Remote approval links</h3>
+        <p>
+          Annual Pro users may create a seven-day, single-use link asking another
+          person to approve or reject a protocol. The link does not provide the
+          PDF; the user must deliver the matching PDF separately and verify the
+          intended recipient. Anyone holding a valid link may submit a name,
+          decision, and signature, so users must protect and, when necessary,
+          cancel the link. Odovzdaj does not verify the signer&apos;s identity or
+          guarantee that the response creates an enforceable agreement.
+        </p>
+
         <h3>Free access and Odovzdaj Pro</h3>
         <p>
           The first completed protocol is available without a Pro purchase.
           Odovzdaj Pro removes the protocol limit and may be offered as an
           auto-renewable annual subscription or a lifetime non-consumable
-          purchase. Pro may also include templates and optional PDF cloud backup.
+          purchase. Both unlock unlimited local protocols and local Pro tools.
+          The lifetime purchase is local-only. The annual subscription also
+          includes ongoing services such as private PDF cloud backup and remote
+          approval while the subscription remains active.
           The exact product, price, billing period, included features,
           and renewal terms are shown in the app before confirmation. Eligible
           purchases can be restored through the in-app restore control.

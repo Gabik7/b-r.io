@@ -56,9 +56,9 @@ export const projects: Project[] = [
     name: 'Odovzdaj',
     label: 'Property handovers · Native iOS',
     description:
-      'A guided way to document a rental handover with room checks, meter readings, keys, photos, signatures, and a finished PDF.',
+      'A guided property record with room checks, on-device meter OCR, evidence photos, signatures, comparisons, and a finished PDF.',
     detail:
-      'Built local-first for landlords and tenants who want one clear record instead of scattered notes, photos, and messages.',
+      'Built local-first for landlords, tenants, hosts, and property managers, with optional private cloud backup and time-limited remote approval.',
     status: 'Preparing for launch',
     year: '2026',
     icon: '/projects/odovzdaj.png',
