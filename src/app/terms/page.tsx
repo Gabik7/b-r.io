@@ -196,12 +196,21 @@ export default function TermsPage() {
           electronic signature or independent proof of identity.
         </p>
 
-        <h3>Local files and sharing</h3>
+        <h3>Local files, optional cloud, and sharing</h3>
         <p>
-          Protocol data and PDF files are stored locally. Odovzdaj does not
-          provide cloud backup or recovery. The user decides where a PDF is
-          exported and remains responsible for recipients, destination security,
-          retention, and deletion of shared copies.
+          Protocol data and PDF files are stored locally by default. Eligible Pro
+          users may optionally sign in with Apple and manually back up completed
+          PDFs to private cloud storage. Cloud availability is not guaranteed,
+          so users should retain any copy needed for tenancy or legal purposes.
+          The user decides where a PDF is exported and remains responsible for
+          recipients, destination security, retention, and deletion of shared
+          copies.
+        </p>
+        <p>
+          A user may delete individual cloud backups or permanently delete the
+          Odovzdaj cloud account and all its backups in the app. Signing out,
+          deleting the app, or cancelling a subscription does not itself delete
+          cloud data. Account deletion and cancellation are separate actions.
         </p>
 
         <h3>Free access and Odovzdaj Pro</h3>
@@ -209,7 +218,8 @@ export default function TermsPage() {
           The first completed protocol is available without a Pro purchase.
           Odovzdaj Pro removes the protocol limit and may be offered as an
           auto-renewable annual subscription or a lifetime non-consumable
-          purchase. The exact product, price, billing period, included features,
+          purchase. Pro may also include templates and optional PDF cloud backup.
+          The exact product, price, billing period, included features,
           and renewal terms are shown in the app before confirmation. Eligible
           purchases can be restored through the in-app restore control.
         </p>

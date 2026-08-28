@@ -201,20 +201,37 @@ export default function PrivacyPage() {
 
       <section id="odovzdaj" className="scroll-mt-24">
         <h2>5. Odovzdaj privacy details</h2>
-        <h3>Information stored on the device</h3>
+        <h3>Local-first use and optional account</h3>
         <p>
-          Odovzdaj does not require an account and does not send protocol content
-          to a Gabriel Falis server. Addresses, unit details, participant names,
-          handover dates, room conditions, notes, meter readings, key counts,
-          signatures, and completed-protocol history are stored locally on the
-          user&apos;s iPhone.
+          Odovzdaj does not require an account. Addresses, unit details,
+          participant names, handover dates, room conditions, notes, meter
+          readings, key counts, signatures, and completed-protocol history are
+          stored locally on the user&apos;s iPhone.
         </p>
         <p>
           Photos selected from the photo library or taken with the camera are
           copied into the app&apos;s local storage only after the user chooses that
           action. Generated PDF protocols are written to the app&apos;s local
           documents storage. They leave the device only when the user exports,
-          shares, backs up, or otherwise transfers them using iOS.
+          shares, or explicitly backs up a completed PDF.
+        </p>
+
+        <h3>Optional Odovzdaj Pro Cloud</h3>
+        <p>
+          A Pro user may choose Sign in with Apple and then manually back up a
+          completed PDF. Supabase Auth processes an internal user identifier and
+          the email address provided or hidden through Apple. The selected PDF
+          and backup metadata—protocol identifier, property label, handover date,
+          file path, checksum, size, and timestamps—are stored in a private
+          Supabase project in the European Union. A PDF may contain participant
+          names, an address, photos, notes, meter readings, signatures, and other
+          content entered by the user.
+        </p>
+        <p>
+          Drafts, standalone original photos, and editable signature data are not
+          separately synced. Access controls restrict each account to its own
+          records and files. Cloud backup remains optional, and local protocol
+          creation continues to work without signing in.
         </p>
 
         <h3>Purchases, analytics, and tracking</h3>
@@ -231,19 +248,21 @@ export default function PrivacyPage() {
           Camera and photo-library access are used only to attach photos to a
           protocol. Denying either permission does not prevent use of the
           remaining protocol features. A completed record and its PDF can be
-          deleted from the app. Deleting the app removes its local data, subject
-          to device backups controlled by the user. Copies previously shared or
-          exported must be deleted from their destination separately.
+          deleted from the app. Individual cloud backups and the complete cloud
+          account can also be deleted in the Pro Cloud screen. Signing out or
+          deleting the app does not by itself delete cloud backups. Copies
+          previously shared or exported must be deleted at their destination.
         </p>
       </section>
 
       <section>
         <h2>6. Service providers and transfers</h2>
         <p>
-          Odovzdaj relies on Apple for App Store distribution, StoreKit purchase
-          processing, and operating-system features the user chooses, such as the
-          camera, photo library, local storage, and share sheet. Odovzdaj does not
-          send protocol content to a Gabriel Falis service provider.
+          Odovzdaj relies on Apple for App Store distribution, StoreKit, Sign in
+          with Apple, and operating-system features such as the camera, photo
+          library, local storage, and share sheet. Supabase provides optional
+          account, database, Edge Function, and private PDF-storage services for
+          Odovzdaj Pro Cloud.
         </p>
         <p>
           Depending on the selected ENSELORA feature, service providers may
@@ -290,11 +309,12 @@ export default function PrivacyPage() {
           separately.
         </p>
         <p>
-          Odovzdaj lets users delete individual completed records and their local
-          PDF files. Photos can be removed while a protocol is being prepared.
-          Because Odovzdaj has no account or server copy, Gabriel Falis cannot
-          remotely access, export, correct, or restore content stored only on the
-          user&apos;s device.
+          Odovzdaj lets users delete individual completed records and local PDF
+          files. Photos can be removed while a protocol is being prepared. Pro
+          Cloud users can restore a backed-up PDF, delete individual backups,
+          sign out, or permanently delete the cloud account and all its backups
+          in the app. Local-only content cannot be remotely accessed, corrected,
+          exported, or restored by Gabriel Falis.
         </p>
         <p>
           Depending on applicable law, you may request access, correction,
