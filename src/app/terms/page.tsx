@@ -3,22 +3,22 @@ import type { Metadata } from 'next'
 import { LegalPage } from '@/components/LegalPage'
 import { createPageMetadata } from '@/lib/metadata'
 
-const title = 'Terms of Service for ENSELORA & Gabriel Falis Apps'
+const title = 'Terms of Service for Odovzdaj, ENSELORA & Gabriel Falis Apps'
 const description =
-  'General terms for apps by Gabriel Falis, with ENSELORA-specific terms for subscriptions, AI outfit suggestions, virtual Try-On, accounts, and acceptable use.'
+  'General terms for apps by Gabriel Falis, with product-specific terms for Odovzdaj handover protocols and ENSELORA wardrobe features.'
 
 export const metadata: Metadata = createPageMetadata({
   title,
   description,
   path: '/terms',
-  heroTitle: 'Terms for ENSELORA and apps by Gabriel Falis.',
+  heroTitle: 'Terms for Odovzdaj, ENSELORA, and apps by Gabriel Falis.',
 })
 
 export default function TermsPage() {
   return (
     <LegalPage
       title="Terms of Service"
-      intro="One set of general terms for apps and related services published by Gabriel Falis, followed by product-specific terms for ENSELORA."
+      intro="One set of general terms for apps and related services published by Gabriel Falis, followed by product-specific terms for Odovzdaj and ENSELORA."
     >
       <section>
         <h2>1. Agreement and scope</h2>
@@ -177,8 +177,46 @@ export default function TermsPage() {
         </p>
       </section>
 
+      <section id="odovzdaj" className="scroll-mt-24">
+        <h2>7. Odovzdaj-specific terms</h2>
+        <h3>The service and user responsibility</h3>
+        <p>
+          Odovzdaj guides users through documenting a property handover and can
+          create a PDF from the information, photos, meter readings, key counts,
+          and signatures entered on the device. It is an organisational tool,
+          not legal advice, identity verification, property inspection, or a
+          guarantee that a protocol is complete, accurate, or enforceable.
+        </p>
+        <p>
+          Users are responsible for checking every entry before signing or
+          sharing a protocol, obtaining permission to photograph the property
+          and process participant information, and keeping any backup required
+          for their tenancy or legal needs. A finger-drawn signature records the
+          drawing supplied on the device; it is not represented as a qualified
+          electronic signature or independent proof of identity.
+        </p>
+
+        <h3>Local files and sharing</h3>
+        <p>
+          Protocol data and PDF files are stored locally. Odovzdaj does not
+          provide cloud backup or recovery. The user decides where a PDF is
+          exported and remains responsible for recipients, destination security,
+          retention, and deletion of shared copies.
+        </p>
+
+        <h3>Free access and Odovzdaj Pro</h3>
+        <p>
+          The first completed protocol is available without a Pro purchase.
+          Odovzdaj Pro removes the protocol limit and may be offered as an
+          auto-renewable annual subscription or a lifetime non-consumable
+          purchase. The exact product, price, billing period, included features,
+          and renewal terms are shown in the app before confirmation. Eligible
+          purchases can be restored through the in-app restore control.
+        </p>
+      </section>
+
       <section>
-        <h2>7. Third-party services</h2>
+        <h2>8. Third-party services</h2>
         <p>
           A covered product may depend on Apple services and other providers for
           hosting, accounts, purchases, cloud storage, AI processing, weather,
@@ -190,7 +228,7 @@ export default function TermsPage() {
       </section>
 
       <section>
-        <h2>8. Availability and product changes</h2>
+        <h2>9. Availability and product changes</h2>
         <p>
           Products may be updated, changed, suspended, or discontinued. Features
           can vary by device, operating-system version, language, region,
@@ -201,7 +239,7 @@ export default function TermsPage() {
       </section>
 
       <section>
-        <h2>9. Ownership and feedback</h2>
+        <h2>10. Ownership and feedback</h2>
         <p>
           The products, including software, design, branding, and original
           content, are owned by Gabriel Falis or relevant licensors and
@@ -216,7 +254,7 @@ export default function TermsPage() {
       </section>
 
       <section>
-        <h2>10. Disclaimer and liability</h2>
+        <h2>11. Disclaimer and liability</h2>
         <p>
           To the maximum extent permitted by law, covered products are provided
           “as is” and “as available,” without warranties beyond those that
@@ -233,7 +271,7 @@ export default function TermsPage() {
       </section>
 
       <section>
-        <h2>11. Suspension and termination</h2>
+        <h2>12. Suspension and termination</h2>
         <p>
           Access may be suspended or ended if you materially violate these
           Terms, threaten the security of a product, or misuse a service. You
@@ -244,7 +282,7 @@ export default function TermsPage() {
       </section>
 
       <section>
-        <h2>12. Governing law and contact</h2>
+        <h2>13. Governing law and contact</h2>
         <p>
           These Terms are governed by the laws of the Slovak Republic, without
           removing mandatory protections available to consumers under the law of

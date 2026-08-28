@@ -3,22 +3,22 @@ import type { Metadata } from 'next'
 import { LegalPage } from '@/components/LegalPage'
 import { createPageMetadata } from '@/lib/metadata'
 
-const title = 'Privacy Policy for ENSELORA & Gabriel Falis Apps'
+const title = 'Privacy Policy for Odovzdaj, ENSELORA & Gabriel Falis Apps'
 const description =
-  'Privacy policy for ENSELORA and other apps by Gabriel Falis, covering local data, photos, optional AI, cloud sync, subscriptions, analytics, and deletion.'
+  'Privacy policy for Odovzdaj, ENSELORA, and other apps by Gabriel Falis, covering local data, photos, purchases, optional cloud services, and deletion.'
 
 export const metadata: Metadata = createPageMetadata({
   title,
   description,
   path: '/privacy',
-  heroTitle: 'Privacy for ENSELORA and apps by Gabriel Falis.',
+  heroTitle: 'Privacy for Odovzdaj, ENSELORA, and apps by Gabriel Falis.',
 })
 
 export default function PrivacyPage() {
   return (
     <LegalPage
       title="Privacy Policy"
-      intro="One policy for apps and related services published by Gabriel Falis. Product-specific details below explain how ENSELORA works without requiring a separate legal website or domain."
+      intro="One policy for apps and related services published by Gabriel Falis. Product-specific details below explain how Odovzdaj and ENSELORA handle information without requiring separate legal websites."
     >
       <section>
         <h2>1. Scope and covered products</h2>
@@ -26,7 +26,8 @@ export default function PrivacyPage() {
           This Privacy Policy applies to mobile apps, websites, support
           channels, and related services published by Gabriel Falis that link to
           this page. It currently provides product-specific disclosures for
-          ENSELORA. New products may be added here before they launch.
+          Odovzdaj and ENSELORA. New products may be added here before they
+          launch.
         </p>
         <p>
           ServiceBook maintains its own product website and privacy information.
@@ -198,8 +199,52 @@ export default function PrivacyPage() {
         </p>
       </section>
 
+      <section id="odovzdaj" className="scroll-mt-24">
+        <h2>5. Odovzdaj privacy details</h2>
+        <h3>Information stored on the device</h3>
+        <p>
+          Odovzdaj does not require an account and does not send protocol content
+          to a Gabriel Falis server. Addresses, unit details, participant names,
+          handover dates, room conditions, notes, meter readings, key counts,
+          signatures, and completed-protocol history are stored locally on the
+          user&apos;s iPhone.
+        </p>
+        <p>
+          Photos selected from the photo library or taken with the camera are
+          copied into the app&apos;s local storage only after the user chooses that
+          action. Generated PDF protocols are written to the app&apos;s local
+          documents storage. They leave the device only when the user exports,
+          shares, backs up, or otherwise transfers them using iOS.
+        </p>
+
+        <h3>Purchases, analytics, and tracking</h3>
+        <p>
+          Apple processes Odovzdaj purchases through the App Store and provides
+          the app with product and entitlement status through StoreKit. Gabriel
+          Falis does not receive full payment-card information. Odovzdaj does not
+          include third-party advertising, analytics, crash-reporting, or
+          tracking SDKs and does not use protocol information for advertising.
+        </p>
+
+        <h3>Permissions, retention, and deletion</h3>
+        <p>
+          Camera and photo-library access are used only to attach photos to a
+          protocol. Denying either permission does not prevent use of the
+          remaining protocol features. A completed record and its PDF can be
+          deleted from the app. Deleting the app removes its local data, subject
+          to device backups controlled by the user. Copies previously shared or
+          exported must be deleted from their destination separately.
+        </p>
+      </section>
+
       <section>
-        <h2>5. Service providers and transfers</h2>
+        <h2>6. Service providers and transfers</h2>
+        <p>
+          Odovzdaj relies on Apple for App Store distribution, StoreKit purchase
+          processing, and operating-system features the user chooses, such as the
+          camera, photo library, local storage, and share sheet. Odovzdaj does not
+          send protocol content to a Gabriel Falis service provider.
+        </p>
         <p>
           Depending on the selected ENSELORA feature, service providers may
           include Apple, Supabase, Google Gemini, Replicate and its named model
@@ -218,7 +263,7 @@ export default function PrivacyPage() {
       </section>
 
       <section>
-        <h2>6. Retention and deletion</h2>
+        <h2>7. Retention and deletion</h2>
         <p>
           Local app information remains until you delete it in the app, remove
           the app, or erase the device, subject to device backups you control.
@@ -228,21 +273,28 @@ export default function PrivacyPage() {
           compliance.
         </p>
         <p>
-          ENSELORA support correspondence is retained for no longer than 12
-          months unless a longer period is reasonably needed to resolve the
+          Support correspondence for covered apps is retained for no longer than
+          12 months unless a longer period is reasonably needed to resolve the
           request or required by law. Temporary AI request and quota records use
           the shorter periods stated in the ENSELORA section above.
         </p>
       </section>
 
       <section>
-        <h2>7. Your controls and rights</h2>
+        <h2>8. Your controls and rights</h2>
         <p>
           ENSELORA provides controls to export app data, delete local data,
           withdraw optional analytics or diagnostics consent, sign out, and
           delete an optional cloud account. Deleting the cloud account removes
           its cloud records and cloud clothing photos; local data can be deleted
           separately.
+        </p>
+        <p>
+          Odovzdaj lets users delete individual completed records and their local
+          PDF files. Photos can be removed while a protocol is being prepared.
+          Because Odovzdaj has no account or server copy, Gabriel Falis cannot
+          remotely access, export, correct, or restore content stored only on the
+          user&apos;s device.
         </p>
         <p>
           Depending on applicable law, you may request access, correction,
@@ -255,7 +307,7 @@ export default function PrivacyPage() {
       </section>
 
       <section>
-        <h2>8. Children, security, and changes</h2>
+        <h2>9. Children, security, and changes</h2>
         <p>
           Covered products are not directed to children under 13 unless an
           individual product says otherwise and provides appropriate safeguards.

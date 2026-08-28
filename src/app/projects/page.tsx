@@ -6,15 +6,15 @@ import { ProjectLinks } from '@/components/ProjectLinks'
 import { createPageMetadata, getSiteUrl } from '@/lib/metadata'
 import { projects } from '@/lib/site'
 
-const title = 'iOS Apps: ServiceBook, ENSELORA & Setlyvo'
+const title = 'iOS Apps: ServiceBook, ENSELORA, Odovzdaj & Setlyvo'
 const description =
-  'Explore ServiceBook, ENSELORA, and Setlyvo: iPhone and web products designed and developed by Gabriel Falis in Slovakia.'
+  'Explore ServiceBook, ENSELORA, Odovzdaj, and Setlyvo: iPhone and web products designed and developed by Gabriel Falis in Slovakia.'
 
 export const metadata: Metadata = createPageMetadata({
   title,
   description,
   path: '/projects',
-  heroTitle: 'ServiceBook, ENSELORA, and Setlyvo.',
+  heroTitle: 'ServiceBook, ENSELORA, Odovzdaj, and Setlyvo.',
 })
 
 export default function ProjectsPage() {

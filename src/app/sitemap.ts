@@ -16,7 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return pages.map(({ path, priority, changeFrequency }) => ({
     url: `${siteUrl}${path === '/' ? '' : path}`,
-    lastModified: new Date('2026-08-16'),
+    lastModified: new Date('2026-08-28'),
     changeFrequency,
     priority,
   }))

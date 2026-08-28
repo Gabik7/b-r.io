@@ -15,7 +15,7 @@ export type Project = {
     'Available on the App Store' | 'Preparing for launch' | 'In development'
   year: string
   icon: string | null
-  artwork: 'servicebook' | 'enselora' | 'setlyvo'
+  artwork: 'servicebook' | 'enselora' | 'odovzdaj' | 'setlyvo'
   websiteHref: string | null
   websiteLabel: string | null
   appStoreHref: string | null
@@ -50,6 +50,21 @@ export const projects: Project[] = [
     artwork: 'enselora',
     websiteHref: '/apps/enselora',
     websiteLabel: 'Explore ENSELORA',
+    appStoreHref: null,
+  },
+  {
+    name: 'Odovzdaj',
+    label: 'Property handovers · Native iOS',
+    description:
+      'A guided way to document a rental handover with room checks, meter readings, keys, photos, signatures, and a finished PDF.',
+    detail:
+      'Built local-first for landlords and tenants who want one clear record instead of scattered notes, photos, and messages.',
+    status: 'Preparing for launch',
+    year: '2026',
+    icon: '/projects/odovzdaj.png',
+    artwork: 'odovzdaj',
+    websiteHref: null,
+    websiteLabel: null,
     appStoreHref: null,
   },
   {

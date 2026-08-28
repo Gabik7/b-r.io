@@ -24,7 +24,7 @@ export function LegalPage({
         <p className="mt-7 max-w-2xl text-lg leading-relaxed text-ink/60">
           {intro}
         </p>
-        <p className="mt-8 text-sm text-ink/45">Effective August 16, 2026</p>
+        <p className="mt-8 text-sm text-ink/45">Effective August 28, 2026</p>
       </header>
       <div className="legal-prose mx-auto mt-14 max-w-5xl">{children}</div>
     </article>

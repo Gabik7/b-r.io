@@ -10,6 +10,7 @@ export function GET() {
 
 - ServiceBook: vehicle service history, fuel, expenses, documents, reminders, and maintenance guidance. Available on the App Store. Product site: https://carservicebook.app
 - ENSELORA: a local-first iPhone digital wardrobe and outfit planner using clothes the user already owns. Preparing for launch. Product details: ${siteUrl}/apps/enselora
+- Odovzdaj: a local-first iPhone app for rental handover checks, photos, signatures, and PDF protocols. Preparing for launch.
 - Setlyvo: an adaptive iPhone training app built around equipment available in the user's gym. In development.
 
 ## ENSELORA
@@ -20,6 +21,14 @@ export function GET() {
 - Official privacy details: ${siteUrl}/privacy#enselora
 - Official terms: ${siteUrl}/terms#enselora
 - Official support: ${siteUrl}/support#enselora
+
+## Odovzdaj
+
+- Works without an account or backend and keeps protocol data on the user's device.
+- Creates local PDF handover records from details, room checks, meter readings, keys, photos, and signatures.
+- Official privacy details: ${siteUrl}/privacy#odovzdaj
+- Official terms: ${siteUrl}/terms#odovzdaj
+- Official support: ${siteUrl}/support#odovzdaj
 
 ## Official pages
 

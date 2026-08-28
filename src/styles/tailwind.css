@@ -194,6 +194,10 @@
     background: oklch(0.955 0.02 82);
   }
 
+  .project-art-odovzdaj {
+    background: oklch(0.96 0.025 72);
+  }
+
   .project-art-setlyvo {
     background: oklch(0.14 0.012 160);
   }
@@ -238,7 +242,8 @@
     color: oklch(0.96 0.01 85 / 0.64);
   }
 
-  .project-art-enselora .project-art-name {
+  .project-art-enselora .project-art-name,
+  .project-art-odovzdaj .project-art-name {
     color: oklch(0.25 0.03 95 / 0.6);
   }
 
