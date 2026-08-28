@@ -76,6 +76,10 @@ bun run build
 - API health: `https://api.gfcodes.com/health`
 - ENSELORA API: `https://api.gfcodes.com/v1/enselora`
 - Setlyvo API: `https://api.gfcodes.com/v1/setlyvo`
+- Odovzdaj: `https://gfcodes.com/projects#odovzdaj`
+- Odovzdaj Privacy: `https://gfcodes.com/privacy#odovzdaj`
+- Odovzdaj Terms: `https://gfcodes.com/terms#odovzdaj`
+- Odovzdaj Support: `https://gfcodes.com/support#odovzdaj`
 
 Právny text musí byť pred vydaním skontrolovaný podľa reálnych dátových tokov a
 App Store privacy odpovede sa s ním musia zhodovať. Produkčné nasadenie na Hetzner
