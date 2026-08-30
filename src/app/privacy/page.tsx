@@ -244,6 +244,22 @@ export default function PrivacyPage() {
           optional access does not prevent use of the remaining report features.
         </p>
 
+        <h3>Optional tenant self-inspection</h3>
+        <p>
+          An eligible annual Pro user may create a seven-day, single-use link
+          for a tenant to record the condition of named rooms. Supabase stores
+          the account owner, protocol reference, expected name, property label,
+          room list, request status and timestamps, plus the submitted room
+          condition, note, and optional photograph. Only a SHA-256 hash of the
+          random invitation token is retained by the service.
+        </p>
+        <p>
+          The form is served through gfcodes.com and forwards the submission to
+          the Odovzdaj service. Evidence photographs are stored in a private
+          bucket and are available only to the authenticated invitation owner.
+          The link becomes unusable after submission, expiry, or cancellation.
+        </p>
+
         <h3>Purchases, retention, and deletion</h3>
         <p>
           Apple processes App Store payments. RevenueCat may process a
@@ -265,6 +281,14 @@ export default function PrivacyPage() {
 
       <section>
         <h2>6. Service providers and transfers</h2>
+        <p>
+          Odovzdaj relies on Apple for App Store distribution, StoreKit, Sign in
+          with Apple, and operating-system features such as the camera, photo
+          library, local storage, and share sheet. Supabase provides optional
+          account, database, Edge Function, and private PDF-storage services for
+          Odovzdaj Pro Cloud, including private remote-approval signatures and
+          tenant self-inspection evidence.
+        </p>
         <p>
           Depending on the selected product feature, service providers may
           include Apple, Supabase, Google Gemini, Replicate and its named model
@@ -314,9 +338,10 @@ export default function PrivacyPage() {
           Odovzdaj lets users delete individual completed records and local PDF
           files. Photos can be removed while a protocol is being prepared. Pro
           Cloud users can restore a backed-up PDF, delete individual backups,
-          cancel approval links, sign out, or permanently delete the cloud
-          account, its backups, approval records, and stored remote signatures in
-          the app. Local-only content cannot be remotely accessed, corrected,
+          cancel approval or tenant-inspection links, sign out, or permanently
+          delete the cloud account, its backups, approval records, stored remote
+          signatures, and tenant-inspection evidence in the app. Local-only
+          content cannot be remotely accessed, corrected,
           exported, or restored by Gabriel Falis.
         </p>
         <p>

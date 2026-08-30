@@ -20,6 +20,7 @@
   --color-muted-foreground: oklch(0.47 0.01 85);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--paper);
+  --color-terracotta: var(--odovzdaj);
   --color-border: oklch(0.2 0.01 85 / 0.12);
   --color-input: oklch(0.2 0.01 85 / 0.15);
   --color-ring: var(--accent);
@@ -30,6 +31,7 @@
   --paper-raised: oklch(0.985 0.006 85);
   --ink: oklch(0.18 0.012 80);
   --accent: oklch(0.56 0.19 255);
+  --odovzdaj: oklch(0.58 0.14 38);
   --setlyvo: oklch(0.78 0.2 140);
 }
 

@@ -231,6 +231,16 @@ export default function TermsPage() {
           guarantee that the response creates an enforceable agreement.
         </p>
 
+        <h3>Tenant self-inspection links</h3>
+        <p>
+          Annual Pro users may also create a seven-day, single-use link asking a
+          tenant to record room conditions, notes, and optional photographs.
+          Anyone holding a valid link can submit the form, so the user must send
+          it only to the intended person and cancel it if exposure is suspected.
+          Odovzdaj does not independently verify the respondent, inspect the
+          property, diagnose defects, or provide a legal or technical opinion.
+        </p>
+
         <h3>Team workspaces</h3>
         <p>
           Team users may create a shared workspace for up to five members with
@@ -251,8 +261,9 @@ export default function TermsPage() {
           and bulk export.
           The lifetime purchase is local-only. The annual subscription also
           includes ongoing services such as private PDF cloud backup and remote
-          approval while the subscription remains active. Team is a separate
-          auto-renewable subscription that adds the shared workspace features.
+          approval and tenant self-inspection while the subscription remains
+          active. Team is a separate auto-renewable subscription that adds the
+          shared workspace features.
           The exact product, price, billing period, included features,
           and renewal terms are shown in the app before confirmation. Eligible
           purchases can be restored through the in-app restore control.
