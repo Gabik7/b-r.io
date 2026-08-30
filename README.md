@@ -76,7 +76,7 @@ bun run build
 - API health: `https://api.gfcodes.com/health`
 - ENSELORA API: `https://api.gfcodes.com/v1/enselora`
 - Setlyvo API: `https://api.gfcodes.com/v1/setlyvo`
-- Odovzdaj: `https://gfcodes.com/projects#odovzdaj`
+- Odovzdaj: `https://gfcodes.com/apps/odovzdaj`
 - Odovzdaj Privacy: `https://gfcodes.com/privacy#odovzdaj`
 - Odovzdaj Terms: `https://gfcodes.com/terms#odovzdaj`
 - Odovzdaj Support: `https://gfcodes.com/support#odovzdaj`
