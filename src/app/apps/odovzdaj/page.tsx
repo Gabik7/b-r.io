@@ -17,6 +17,12 @@ const features = [
   ['Property operations', 'Recurring maintenance, safety checks, asset passports, providers, costs, and reminders.'],
   ['Optional secure cloud', 'Private PDF backup, Team workspaces, remote approval, and tenant self-inspection for eligible plans.'],
 ]
+const architecture = [
+  ['Native foundation', 'Swift 6, SwiftUI, SwiftData, PDFKit, PencilKit, and Apple frameworks. Requires iOS or iPadOS 18 or later.'],
+  ['Local-first by design', 'Drafts, evidence, signatures, PDFs, reminders, and history stay on the device unless you deliberately use a cloud feature.'],
+  ['On-device assistance', 'Meter OCR, photo checks, and neutral note suggestions use Apple Vision on the device. Protocol content is not sent to an external AI model.'],
+  ['Optional protected services', 'Sign in with Apple and an EU-hosted Supabase project provide private storage, owner-scoped database access, and short-lived server workflows. RevenueCat verifies eligible purchases.'],
+]
 
 export const metadata: Metadata = createPageMetadata({
   title,
@@ -89,6 +95,18 @@ export default function OdovzdajPage() {
         </div>
       </section>
 
+      <section className="mx-auto grid max-w-7xl gap-10 border-b border-ink/12 py-16 lg:grid-cols-[0.35fr_0.65fr] lg:gap-20 lg:py-24">
+        <h2 className="text-lg font-medium">Technical foundation</h2>
+        <div className="grid gap-x-10 gap-y-9 sm:grid-cols-2">
+          {architecture.map(([heading, body]) => (
+            <article key={heading} className="border-t border-ink/12 pt-6">
+              <h3 className="text-2xl font-medium tracking-[-0.025em]">{heading}</h3>
+              <p className="mt-4 leading-relaxed text-ink/60">{body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section className="mx-auto grid max-w-7xl gap-10 py-16 lg:grid-cols-[0.35fr_0.65fr] lg:gap-20 lg:py-24">
         <h2 className="text-lg font-medium">Privacy by default</h2>
         <div>
@@ -98,7 +116,9 @@ export default function OdovzdajPage() {
           <p className="mt-7 max-w-3xl text-lg leading-relaxed text-ink/62">
             The core app works without an account. Optional cloud features use
             Sign in with Apple, owner-scoped database access, and private file
-            storage. The app contains no advertising or cross-app tracking.
+            storage. The app contains no advertising, cross-app tracking,
+            third-party analytics, external crash-reporting SDK, or remote AI
+            processing.
           </p>
           <div className="mt-9 flex flex-wrap gap-x-6 gap-y-3">
             <Link href="/privacy#odovzdaj" className="text-link">

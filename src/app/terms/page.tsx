@@ -280,6 +280,14 @@ export default function TermsPage() {
           not responsible for a third-party service beyond what applicable law
           requires.
         </p>
+        <p>
+          Odovzdaj specifically relies on Apple for distribution, device
+          capabilities, Sign in with Apple, and App Store billing; Supabase for
+          optional account and cloud features; RevenueCat for purchase
+          entitlement verification; and the GFCodes infrastructure for its web
+          forms. Odovzdaj does not use a remote AI, advertising, cross-app
+          tracking, third-party analytics, or external crash-reporting service.
+        </p>
       </section>
 
       <section>

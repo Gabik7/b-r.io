@@ -290,12 +290,22 @@ export default function PrivacyPage() {
           tenant self-inspection evidence.
         </p>
         <p>
-          Depending on the selected product feature, service providers may
-          include Apple, Supabase, Google Gemini, Replicate and its named model
-          providers, RevenueCat, PostHog, Sentry, and the infrastructure provider
-          hosting the self-managed GFCodes web, API, and private Redis service.
-          They process information only for the relevant hosting, account,
-          purchase, AI, rate-limiting, analytics, diagnostics, or support purpose.
+          RevenueCat verifies eligible Odovzdaj purchases and entitlement status.
+          The infrastructure hosting GFCodes serves the tenant self-inspection
+          form and forwards its encrypted request to the Odovzdaj service.
+          Odovzdaj does not send protocol content, photographs, signatures, or
+          account information to Google Gemini or Replicate, and the app does
+          not include PostHog, Sentry, third-party advertising, or cross-app
+          tracking SDKs.
+        </p>
+        <p>
+          ENSELORA uses the providers described in its product-specific section
+          above. Depending on the ENSELORA feature explicitly selected by the
+          user, those providers may include Apple, Supabase, Google Gemini,
+          Replicate and its configured model providers, RevenueCat, PostHog,
+          Sentry, and the service infrastructure used for hosting, security,
+          quotas, and support. A provider processes information only for the
+          product and purpose described in the relevant section of this policy.
         </p>
         <p>
           Providers may process information outside the European Economic Area.
@@ -319,8 +329,8 @@ export default function PrivacyPage() {
         <p>
           Support correspondence for covered apps is retained for no longer than
           12 months unless a longer period is reasonably needed to resolve the
-          request or required by law. Temporary AI request and quota records use
-          the shorter periods stated in the ENSELORA section above.
+          request or required by law. Temporary AI request and quota records apply
+          only to ENSELORA and use the shorter periods stated in its section above.
         </p>
       </section>
 

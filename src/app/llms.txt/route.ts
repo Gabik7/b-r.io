@@ -10,7 +10,7 @@ export function GET() {
 
 - ServiceBook: vehicle service history, fuel, expenses, documents, reminders, and maintenance guidance. Available on the App Store. Product site: https://carservicebook.app
 - ENSELORA: a local-first iPhone digital wardrobe and outfit planner using clothes the user already owns. Preparing for launch. Product details: ${siteUrl}/apps/enselora
-- Odovzdaj: a local-first iPhone property handover and inspection app with evidence, professional PDF reports, optional cloud, and Team workspaces. Preparing for launch. Product details: ${siteUrl}/apps/odovzdaj
+- Odovzdaj: a local-first native iPhone and iPad property handover and inspection app for iOS/iPadOS 18 or later, with evidence, professional PDF reports, optional cloud, and Team workspaces. Preparing for launch. Product details: ${siteUrl}/apps/odovzdaj
 - Setlyvo: an adaptive iPhone training app built around equipment available in the user's gym. In development.
 
 ## ENSELORA
@@ -28,6 +28,7 @@ export function GET() {
 - Creates branded local PDF records from room checks, meter readings, keys, numbered evidence photos, witnesses, and signatures.
 - Annual Pro offers private PDF backup, sanitised draft sync, and seven-day remote approval links; a link never exposes the PDF or property address.
 - Team adds a shared workspace for up to five members with roles, shared properties and drafts, and a change audit.
+- On-device assistance uses Apple frameworks. Odovzdaj does not send protocol content to remote AI models and does not include advertising, third-party analytics, external crash reporting, or cross-app tracking.
 - Official privacy details: ${siteUrl}/privacy#odovzdaj
 - Official terms: ${siteUrl}/terms#odovzdaj
 - Official support: ${siteUrl}/support#odovzdaj

@@ -30,8 +30,8 @@ const topics = [
     body: 'Email me to ask about your information, request an export or deletion, or withdraw an optional consent.',
   },
   {
-    title: 'Odovzdaj approval link',
-    body: 'Include only the protocol number and link status. Do not email a private protocol PDF unless it is necessary and safe to do so.',
+    title: 'Odovzdaj secure link',
+    body: 'For an approval or tenant self-inspection link, include only the protocol number and link status. Do not email its token or a private PDF.',
   },
 ]
 
@@ -66,6 +66,12 @@ export default function SupportPage() {
               Please do not send passwords, full payment details, or other
               sensitive information. A screenshot is useful when it does not
               contain private data.
+            </p>
+            <p className="mt-4 max-w-2xl leading-relaxed text-ink/58">
+              Odovzdaj cloud users can delete individual backups, cancel secure
+              links, or permanently delete the cloud account directly in Pro
+              Cloud. If the app is inaccessible, use the email above and include
+              “Odovzdaj privacy request” in the subject.
             </p>
           </div>
         </section>
