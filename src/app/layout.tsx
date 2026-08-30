@@ -26,7 +26,7 @@ const metadataBase = (() => {
 })()
 const title = 'Gabriel Falis | iOS & Web App Developer'
 const description =
-  'Independent iOS and web developer from Slovakia building ServiceBook, ENSELORA, and Setlyvo.'
+  'Independent iOS and web developer from Slovakia building ServiceBook, ENSELORA, Odovzdaj, and Setlyvo.'
 
 export const metadata: Metadata = {
   metadataBase,
@@ -42,6 +42,7 @@ export const metadata: Metadata = {
     'iOS developer Slovakia',
     'SwiftUI developer',
     'ENSELORA',
+    'Odovzdaj',
     'ServiceBook',
     'Setlyvo',
   ],

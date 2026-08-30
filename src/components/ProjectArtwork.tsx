@@ -26,7 +26,7 @@ export function ProjectArtwork({
         />
       ) : (
         <div className="setlyvo-mark">
-          <span>S</span>
+          <span>{project.name.slice(0, 1)}</span>
         </div>
       )}
       <span className="project-art-name" translate="no">

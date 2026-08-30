@@ -7,7 +7,7 @@ import { projects, site } from '@/lib/site'
 
 const title = 'App Support for Odovzdaj, ENSELORA, Setlyvo & ServiceBook'
 const description =
-  'Contact Gabriel Falis for Odovzdaj, ENSELORA, Setlyvo, and ServiceBook support, purchases, privacy requests, and technical issues.'
+  'Contact Gabriel Falis for ENSELORA, Odovzdaj, Setlyvo, and ServiceBook support, subscriptions, privacy requests, account deletion, and technical issues.'
 
 export const metadata: Metadata = createPageMetadata({
   title,

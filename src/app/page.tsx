@@ -7,7 +7,7 @@ import { site } from '@/lib/site'
 
 const title = 'Gabriel Falis | iOS & Web App Developer'
 const description =
-  'Independent developer from Slovakia building ServiceBook, ENSELORA, and Setlyvo for iPhone and the web.'
+  'Independent developer from Slovakia building ServiceBook, ENSELORA, Odovzdaj, and Setlyvo for iPhone and the web.'
 
 export const metadata: Metadata = createPageMetadata({
   title: { absolute: title },
@@ -30,7 +30,7 @@ export default function Home() {
           url: siteUrl,
           name: title,
           description,
-          dateModified: '2026-08-16',
+          dateModified: '2026-08-30',
           mainEntity: {
             '@type': 'Person',
             '@id': `${siteUrl}/#gabriel-falis`,

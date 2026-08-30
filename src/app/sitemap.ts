@@ -5,6 +5,7 @@ import { getSiteUrl } from '@/lib/metadata'
 const pages = [
   { path: '/', priority: 1, changeFrequency: 'monthly' },
   { path: '/apps/enselora', priority: 0.9, changeFrequency: 'weekly' },
+  { path: '/apps/odovzdaj', priority: 0.9, changeFrequency: 'weekly' },
   { path: '/projects', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/support', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/privacy', priority: 0.5, changeFrequency: 'monthly' },
@@ -16,7 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return pages.map(({ path, priority, changeFrequency }) => ({
     url: `${siteUrl}${path === '/' ? '' : path}`,
-    lastModified: new Date('2026-08-28'),
+    lastModified: new Date('2026-08-30'),
     changeFrequency,
     priority,
   }))

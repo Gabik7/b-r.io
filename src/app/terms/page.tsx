@@ -5,7 +5,7 @@ import { createPageMetadata } from '@/lib/metadata'
 
 const title = 'Terms of Service for Odovzdaj, ENSELORA & Gabriel Falis Apps'
 const description =
-  'General terms for apps by Gabriel Falis, with product-specific terms for Odovzdaj handover protocols and ENSELORA wardrobe features.'
+  'General terms for apps by Gabriel Falis, with product-specific purchase, subscription, account, cloud, AI, team, and acceptable-use terms.'
 
 export const metadata: Metadata = createPageMetadata({
   title,
@@ -186,6 +186,8 @@ export default function TermsPage() {
           and signatures entered on the device. It is an organisational tool,
           not legal advice, identity verification, property inspection, or a
           guarantee that a protocol is complete, accurate, or enforceable.
+          On-device visual categories and note suggestions can be incomplete or
+          wrong and must be verified in person.
         </p>
         <p>
           Users are responsible for checking every entry before signing or
@@ -202,8 +204,10 @@ export default function TermsPage() {
         <h3>Local files, optional cloud, and sharing</h3>
         <p>
           Protocol data and PDF files are stored locally by default. Eligible Pro
-          users may optionally sign in with Apple and manually back up completed
-          PDFs to private cloud storage. Cloud availability is not guaranteed,
+          users may optionally sign in with Apple, manually back up completed
+          PDFs, and synchronise sanitised drafts to private cloud storage. Draft
+          sync excludes photos, logos, signatures, and embedded reference
+          copies. Cloud availability is not guaranteed,
           so users should retain any copy needed for tenancy or legal purposes.
           The user decides where a PDF is exported and remains responsible for
           recipients, destination security, retention, and deletion of shared
@@ -227,15 +231,28 @@ export default function TermsPage() {
           guarantee that the response creates an enforceable agreement.
         </p>
 
+        <h3>Team workspaces</h3>
+        <p>
+          Team users may create a shared workspace for up to five members with
+          invitations, roles, shared property templates and sanitised drafts,
+          and a change audit. Invitation tokens must be protected and shared
+          only with their intended recipient. Team changes require the workspace
+          owner’s active server-verified entitlement and available cloud services.
+        </p>
+
         <h3>Free access and Odovzdaj Pro</h3>
         <p>
-          The first completed protocol is available without a Pro purchase.
-          Odovzdaj Pro removes the protocol limit and may be offered as an
+          The first completed protocol, one saved property, one active reminder,
+          and the basic templates shown in the app are available without a Pro
+          purchase. Odovzdaj Pro removes those limits and may be offered as an
           auto-renewable annual subscription or a lifetime non-consumable
-          purchase. Both unlock unlimited local protocols and local Pro tools.
+          purchase. Both unlock unlimited local protocols, properties, templates,
+          reminders, comparisons, branding, on-device assistance, evidence tools,
+          and bulk export.
           The lifetime purchase is local-only. The annual subscription also
           includes ongoing services such as private PDF cloud backup and remote
-          approval while the subscription remains active.
+          approval while the subscription remains active. Team is a separate
+          auto-renewable subscription that adds the shared workspace features.
           The exact product, price, billing period, included features,
           and renewal terms are shown in the app before confirmation. Eligible
           purchases can be restored through the in-app restore control.

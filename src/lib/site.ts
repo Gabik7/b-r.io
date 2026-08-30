@@ -56,15 +56,15 @@ export const projects: Project[] = [
     name: 'Odovzdaj',
     label: 'Property handovers · Native iOS',
     description:
-      'A guided property record with room checks, on-device meter OCR, evidence photos, signatures, comparisons, and a finished PDF.',
+      'A premium property record with room checks, on-device assistance, evidence photos, signatures, comparisons, and professional PDF export.',
     detail:
-      'Built local-first for landlords, tenants, hosts, and property managers, with optional private cloud backup and time-limited remote approval.',
+      'Built local-first for landlords, tenants, inspectors, and property managers, with optional private cloud, remote approval, and Team workspaces.',
     status: 'Preparing for launch',
     year: '2026',
     icon: '/projects/odovzdaj.png',
     artwork: 'odovzdaj',
-    websiteHref: null,
-    websiteLabel: null,
+    websiteHref: '/apps/odovzdaj',
+    websiteLabel: 'Explore Odovzdaj',
     appStoreHref: null,
   },
   {

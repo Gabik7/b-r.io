@@ -32,8 +32,8 @@ export default function ProjectsPage() {
             '@type': 'ListItem',
             position: index + 1,
             url:
-              project.artwork === 'enselora'
-                ? `${siteUrl}/apps/enselora`
+              project.websiteHref?.startsWith('/')
+                ? `${siteUrl}${project.websiteHref}`
                 : project.websiteHref?.startsWith('http')
                   ? project.websiteHref
                   : `${siteUrl}/projects#${project.artwork}`,

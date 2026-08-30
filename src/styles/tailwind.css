@@ -228,6 +228,11 @@
     transform: translateX(-0.04em);
   }
 
+  .project-art-odovzdaj .setlyvo-mark {
+    border-color: oklch(0.96 0.025 82);
+    color: oklch(0.96 0.025 82);
+  }
+
   .project-art-name {
     position: absolute;
     bottom: 1.15rem;

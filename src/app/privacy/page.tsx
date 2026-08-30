@@ -201,94 +201,72 @@ export default function PrivacyPage() {
 
       <section id="odovzdaj" className="scroll-mt-24">
         <h2>5. Odovzdaj privacy details</h2>
-        <h3>Local-first use and optional account</h3>
+        <h3>Local reports and optional cloud</h3>
         <p>
-          Odovzdaj does not require an account. Addresses, unit details,
-          participant names, handover dates, room conditions, notes, meter
-          readings, key counts, contact details, witness details, company
-          branding, signatures, evidence annotations, integrity hashes, and
-          completed-protocol history are stored locally on the user&apos;s iPhone.
+          Odovzdaj creates property inspection and handover reports on the
+          iPhone without requiring an account. Local drafts, saved properties,
+          reminders, photos, annotations, signatures, generated PDFs, and
+          history remain on the device unless you choose an eligible cloud
+          feature. Local notifications are scheduled by iOS.
         </p>
         <p>
-          Photos selected from the photo library or taken with the camera are
-          copied into the app&apos;s local storage only after the user chooses that
-          action. Generated PDF protocols are written to the app&apos;s local
-          documents storage. They leave the device only when the user exports,
-          shares, or explicitly backs up a completed PDF.
-        </p>
-
-        <h3>Optional Odovzdaj Pro Cloud</h3>
-        <p>
-          A Pro user may choose Sign in with Apple and then manually back up a
-          completed PDF. Supabase Auth processes an internal user identifier and
-          the email address provided or hidden through Apple. The selected PDF
-          and backup metadata—protocol identifier, property label, handover date,
-          file path, checksum, size, and timestamps—are stored in a private
-          Supabase project in the European Union. A PDF may contain participant
-          names, an address, photos, notes, meter readings, signatures, and other
-          content entered by the user.
-        </p>
-        <p>
-          Drafts, standalone original photos, and editable signature data are not
-          separately synced. Access controls restrict each account to its own
-          records and files. Cloud backup remains optional, and local protocol
-          creation continues to work without signing in.
+          Optional Sign in with Apple creates a Supabase account. Annual Pro or
+          Team users can explicitly upload completed PDFs and basic report
+          metadata, or sync a sanitised draft. A synced draft excludes room
+          photos, evidence files, company logos, signatures, remote-approval
+          certificates, and embedded reference-report copies. Private database,
+          storage, and row-level access rules restrict account data.
         </p>
 
-        <h3>Optional remote approval</h3>
+        <h3>Team workspaces</h3>
         <p>
-          The annual Odovzdaj Pro plan may let a signed-in user create a
-          time-limited approval request for a backed-up protocol. Supabase stores
-          the account owner, protocol identifier, expected signer name, signer
-          role, request status, expiry and response timestamps, the responding
-          name, and—only after approval—the supplied signature image in private
-          storage. The random approval token is shown only to the owner; only its
-          SHA-256 hash is stored by the service.
-        </p>
-        <p>
-          The approval link displays only the protocol number. It does not expose
-          the PDF, property address, photographs, or other protocol contents.
-          The owner must provide the PDF separately to the intended recipient.
-          Anyone who receives the unexpired link can submit a decision, so users
-          must share it only with the intended person. A link expires after no
-          more than seven days, becomes unusable after a response, and may be
-          cancelled by the account owner.
+          Team may store shared property templates and sanitised drafts, member
+          identifiers, a member-provided display name or Sign in with Apple
+          email, roles, invitations, and a change audit. Invitations use a
+          random token; only its SHA-256 hash is stored. A workspace owner’s
+          active Team entitlement is checked server-side before shared content
+          can be changed.
         </p>
 
-        <h3>Purchases, analytics, and tracking</h3>
+        <h3>Photos, on-device assistance, and remote approval</h3>
         <p>
-          Apple processes Odovzdaj purchases through the App Store and provides
-          the app with product and entitlement status through StoreKit. Gabriel
-          Falis does not receive full payment-card information. Odovzdaj does not
-          include third-party advertising, analytics, crash-reporting, or
-          tracking SDKs and does not use protocol information for advertising.
+          Apple Vision can classify a selected room photo on the device to
+          suggest neutral wording. It does not determine damage and does not
+          upload the photo for this feature. If you create a seven-day remote
+          approval link, the recipient sees the confirmation form rather than
+          the report PDF, address, or report photos. The service stores request
+          status, signer name, optional response note, and an approved signature.
+        </p>
+        <p>
+          Camera and photo-library access are used only when you attach photos,
+          scan a meter display on device, or select a company logo. The system
+          contact picker shares only the contact you explicitly select. Denying
+          optional access does not prevent use of the remaining report features.
         </p>
 
-        <h3>Permissions, retention, and deletion</h3>
+        <h3>Purchases, retention, and deletion</h3>
         <p>
-          Camera and photo-library access are used only to attach photos, scan a
-          meter display on-device with Apple Vision, or select a company logo.
-          The system contact picker shares only the contact explicitly selected
-          by the user. Denying optional access does not prevent use of the
-          remaining protocol features. A completed record and its PDF can be
-          deleted from the app. Individual cloud backups and the complete cloud
-          account can also be deleted in the Pro Cloud screen. Signing out or
-          deleting the app does not by itself delete cloud backups. Copies
-          previously shared or exported must be deleted at their destination.
+          Apple processes App Store payments. RevenueCat may process a
+          pseudonymous app-user identifier, product and transaction identifiers,
+          webhook event identifiers, expiry, environment, and entitlement
+          status. It does not provide payment-card details to Odovzdaj. Verified
+          webhook events are deduplicated and retained in a minimised support
+          record rather than as a full billing payload.
+        </p>
+        <p>
+          You can delete individual cloud PDFs and drafts, disconnect without
+          deleting, or permanently delete the cloud account in the app. Account
+          deletion removes the user’s cloud records and private files; audit
+          authorship may become anonymous where shared team data must remain for
+          other members. Deleting the app removes local data but does not itself
+          delete cloud data.
         </p>
       </section>
 
       <section>
         <h2>6. Service providers and transfers</h2>
         <p>
-          Odovzdaj relies on Apple for App Store distribution, StoreKit, Sign in
-          with Apple, and operating-system features such as the camera, photo
-          library, local storage, and share sheet. Supabase provides optional
-          account, database, Edge Function, and private PDF-storage services for
-          Odovzdaj Pro Cloud, including private remote-approval signatures.
-        </p>
-        <p>
-          Depending on the selected ENSELORA feature, service providers may
+          Depending on the selected product feature, service providers may
           include Apple, Supabase, Google Gemini, Replicate and its named model
           providers, RevenueCat, PostHog, Sentry, and the infrastructure provider
           hosting the self-managed GFCodes web, API, and private Redis service.
@@ -325,7 +303,8 @@ export default function PrivacyPage() {
       <section>
         <h2>8. Your controls and rights</h2>
         <p>
-          ENSELORA provides controls to export app data, delete local data,
+          Covered products provide controls appropriate to their features to
+          export app data, delete local data,
           withdraw optional analytics or diagnostics consent, sign out, and
           delete an optional cloud account. Deleting the cloud account removes
           its cloud records and cloud clothing photos; local data can be deleted
