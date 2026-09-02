@@ -308,6 +308,11 @@ export function detectedImageMimeType(bytes: Uint8Array): "image/jpeg" | "image/
 type CachedEntitlement = { isPremium: boolean; expiresAt: number };
 const entitlementCache = new Map<string, CachedEntitlement>();
 
+export function revenueCatPremiumEntitlement(payload: any): any {
+  const entitlements = payload?.subscriber?.entitlements ?? {};
+  return entitlements.enselora_plus ?? entitlements["ENSELORA+"];
+}
+
 export async function hasPremiumEntitlement(userId: string): Promise<boolean> {
   const cached = entitlementCache.get(userId);
   if (cached && cached.expiresAt > Date.now()) return cached.isPremium;
@@ -324,7 +329,7 @@ export async function hasPremiumEntitlement(userId: string): Promise<boolean> {
   }
   if (!response.ok) throw new ApiError(502, "ENSELORA+ sa nepodarilo overiť.");
   const payload = await response.json() as any;
-  const entitlement = payload?.subscriber?.entitlements?.enselora_plus;
+  const entitlement = revenueCatPremiumEntitlement(payload);
   const expires = entitlement?.expires_date ? new Date(entitlement.expires_date).getTime() : Number.POSITIVE_INFINITY;
   const isPremium = Boolean(entitlement) && expires > Date.now();
   if (isPremium) {

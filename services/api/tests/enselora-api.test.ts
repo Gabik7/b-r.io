@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { createHmac } from "node:crypto";
-import { ApiError, authenticatedRequestIdentity, detectedImageMimeType, imageDataUrl, premiumEntitlementForUsage, rateLimitKey, requestClientIdentifier, requestIPAddress, requestIdentity, responseLanguage, safeProviderURL, tryOnQuotaKey, usageQuotaKey } from "../src/apps/enselora/api";
+import { ApiError, authenticatedRequestIdentity, detectedImageMimeType, imageDataUrl, premiumEntitlementForUsage, rateLimitKey, requestClientIdentifier, requestIPAddress, requestIdentity, responseLanguage, revenueCatPremiumEntitlement, safeProviderURL, tryOnQuotaKey, usageQuotaKey } from "../src/apps/enselora/api";
 import { constantTimeSecretMatch } from "../src/apps/enselora/app-attest";
 import { revenueCatEventUserId, webhookAuthorized } from "../src/apps/enselora/commerce";
 import { runtimeConfigStatus } from "../src/apps/enselora/config";
@@ -104,6 +104,14 @@ describe("ENSELORA API validation", () => {
 
   test("uses free limits when RevenueCat verification is unavailable", async () => {
     expect(await premiumEntitlementForUsage("12345678-1234-1234-1234-123456789abc")).toBe(false);
+  });
+
+  test("accepts canonical and legacy ENSELORA+ entitlement identifiers", () => {
+    const canonical = { subscriber: { entitlements: { enselora_plus: { expires_date: null } } } };
+    const legacy = { subscriber: { entitlements: { "ENSELORA+": { expires_date: null } } } };
+
+    expect(revenueCatPremiumEntitlement(canonical)).toEqual({ expires_date: null });
+    expect(revenueCatPremiumEntitlement(legacy)).toEqual({ expires_date: null });
   });
 
   test("maps supported app locales to model response languages", () => {

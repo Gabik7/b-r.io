@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { Buffer } from "node:buffer";
-import { ApiError } from "./api";
+import { ApiError, revenueCatPremiumEntitlement } from "./api";
 import { supabaseAdmin } from "./supabase-admin";
 
 type RevenueCatEvent = {
@@ -58,7 +58,7 @@ async function revenueCatPremiumStatus(userId: string): Promise<boolean> {
   if (response.status === 404) return false;
   if (!response.ok) throw new ApiError(502, "RevenueCat audit sa nepodarilo dokončiť.");
   const payload = await response.json() as any;
-  const entitlement = payload?.subscriber?.entitlements?.enselora_plus;
+  const entitlement = revenueCatPremiumEntitlement(payload);
   const expiration = entitlement?.expires_date ? Date.parse(entitlement.expires_date) : Number.POSITIVE_INFINITY;
   return Boolean(entitlement) && expiration > Date.now();
 }
