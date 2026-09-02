@@ -353,7 +353,7 @@ export async function premiumEntitlementForUsage(userId: string): Promise<boolea
 }
 
 export function dailyOutfitGenerationLimit(isPremium: boolean): number {
-  return isPremium ? 5 : 3;
+  return isPremium ? 5 : 2;
 }
 
 export async function requirePremium(

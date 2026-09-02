@@ -115,7 +115,7 @@ describe("ENSELORA API validation", () => {
   });
 
   test("keeps server outfit limits aligned with free and premium clients", () => {
-    expect(dailyOutfitGenerationLimit(false)).toBe(3);
+    expect(dailyOutfitGenerationLimit(false)).toBe(2);
     expect(dailyOutfitGenerationLimit(true)).toBe(5);
   });
 
