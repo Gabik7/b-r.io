@@ -2,9 +2,10 @@ import type { APIRoute } from "astro";
 import { ApiError, authenticatedRequestIdentity, claimTryOnRequest, completeTryOnRequest, enforceAIRequestLimits, enforceRateLimit, geminiJSON, handleApiError, imageDataUrl, json, parseJson, readRawBody, releaseTryOn, releaseTryOnRequest, remoteImageBase64, replicateRun, requirePremium, reserveTryOn } from "../../../apps/enselora/api";
 import { verifyRequestAppAttest } from "../../../apps/enselora/app-attest";
 import { consumePurchasedTryOnCredit, refundPurchasedTryOnCredit } from "../../../apps/enselora/commerce";
+import { tryOnGarmentRequirements, type TryOnGarmentDescriptorInput } from "../../../apps/enselora/try-on";
 
 export const prerender = false;
-type Body = { personImageBase64?: string; garmentImagesBase64?: string[]; pose?: string; variantIndex?: number; quality?: string; locale?: string };
+type Body = { personImageBase64?: string; garmentImagesBase64?: string[]; pose?: string; variantIndex?: number; quality?: string; locale?: string; garments?: TryOnGarmentDescriptorInput[] };
 
 export const POST: APIRoute = async ({ request }) => {
   let requestId: string | undefined;
@@ -31,6 +32,7 @@ export const POST: APIRoute = async ({ request }) => {
     if (!garments.length) throw new ApiError(400, "Vyber aspoň jeden kúsok oblečenia.");
     const person = imageDataUrl(body.personImageBase64, "image/jpeg");
     const garmentImages = garments.map((item) => imageDataUrl(item, item.startsWith("iVBOR") ? "image/png" : "image/jpeg"));
+    const garmentRequirements = tryOnGarmentRequirements(body.garments, garments.length);
     const allowedPoses = new Set(["front-facing, natural standing pose", "natural three-quarter pose", "subtle walking pose, full body visible"]);
     const pose = allowedPoses.has(String(body.pose)) ? String(body.pose) : "front-facing, natural standing pose";
     const variantIndex = Math.min(3, Math.max(1, Math.round(Number(body.variantIndex) || 1)));
@@ -53,7 +55,7 @@ export const POST: APIRoute = async ({ request }) => {
     const run = (model: string, label: string) => replicateRun(model, {
         person_image: person,
         garment_images: garmentImages,
-        prompt: `${pose}; preserve the person's face, identity, body proportions and skin tone; preserve exact garment colors, visible material texture, hems and logos; layer garments in the supplied order without merging them; realistic shadows and contact points; visual variation ${variantIndex}; this is a styling preview, never alter body size`,
+        prompt: `${pose}; preserve the person's face, identity, body proportions and skin tone; ${garmentRequirements.prompt} Layer garments in the supplied order without merging them; realistic shadows and contact points; visual variation ${variantIndex}; this is a styling preview, never alter body size`,
         output_format: "jpg",
         output_quality: 95,
         preserve_input_size: true,
@@ -83,9 +85,16 @@ export const POST: APIRoute = async ({ request }) => {
     const candidates = await Promise.all(outputs.map(remoteImageBase64));
     let bestIndex = 0;
     if (candidates.length > 1) {
+      const referenceImages = garments.map((base64) => ({
+        base64,
+        mimeType: base64.startsWith("iVBOR") ? "image/png" : "image/jpeg",
+      }));
       const decision = await geminiJSON<{ bestIndex?: number }>(
-        "The images are virtual try-on candidates in their supplied order. Choose the candidate that best preserves the same face and identity, garment colors, material texture, clean layering, natural anatomy and realistic contact shadows. Return only JSON with bestIndex using a zero-based integer. Do not judge attractiveness or body shape.",
-        candidates.map((base64) => ({ base64, mimeType: "image/jpeg" })),
+        `The first ${referenceImages.length} images are authoritative garment references. The following ${candidates.length} images are virtual try-on candidates in candidate order. ${garmentRequirements.prompt} Choose the candidate that most faithfully preserves garment category, silhouette, proportions, hem length, colors and texture, then face and identity, clean layering, natural anatomy and realistic contact shadows. Return only JSON with bestIndex using a zero-based candidate integer. Do not judge attractiveness or body shape.`,
+        [
+          ...referenceImages,
+          ...candidates.map((base64) => ({ base64, mimeType: "image/jpeg" })),
+        ],
         { userId: identity.userId, requestId: `${identity.requestId}-judge`, operation: "try-on-quality-selection" },
       );
       const selected = Math.round(Number(decision.bestIndex));
