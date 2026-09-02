@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { ApiError, authenticatedRequestIdentity, claimJSONRequest, completeJSONRequest, enforceAIRequestLimits, enforceRateLimit, geminiJSON, handleApiError, json, parseJson, premiumEntitlementForUsage, readRawBody, releaseJSONRequest, releaseUsage, reserveUsage, responseLanguage } from "../../../../apps/enselora/api";
+import { ApiError, authenticatedRequestIdentity, claimJSONRequest, completeJSONRequest, dailyOutfitGenerationLimit, enforceAIRequestLimits, enforceRateLimit, geminiJSON, handleApiError, json, parseJson, premiumEntitlementForUsage, readRawBody, releaseJSONRequest, releaseUsage, reserveUsage, responseLanguage } from "../../../../apps/enselora/api";
 import { verifyRequestAppAttest } from "../../../../apps/enselora/app-attest";
 import { sanitizedGarmentPairings } from "../../../../apps/enselora/styling-signals";
 
@@ -51,11 +51,11 @@ export const POST: APIRoute = async ({ request }) => {
     const reservation = await reserveUsage(
       identity.userId,
       "outfit-generation",
-      isPremium ? 5 : 1,
+      dailyOutfitGenerationLimit(isPremium),
       "day",
       isPremium
         ? "Dnešných 5 AI návrhov bolo využitých. Ďalšie budú dostupné zajtra."
-        : "Dnešný bezplatný AI návrh bol využitý. Ďalší je dostupný zajtra alebo s ENSELORA+.",
+        : "Dnešné 3 bezplatné AI návrhy boli využité. Ďalšie budú dostupné zajtra alebo s ENSELORA+.",
     );
     reservationKey = reservation.key;
     const result = await geminiJSON<Result>(`You are a practical personal stylist. Create ${requestedCount} meaningfully different outfits, each using 3-4 compatible real items only from this JSON wardrobe. Vary silhouette or layer while respecting context, category balance, weather, occasion and underused items. Prefer positively rated garments when they fit. Avoid negatively rated garments and rejection patterns when enough alternatives exist; never sacrifice weather or occasion suitability. Return only JSON with an outfits array; every item has title and explanation in ${responseLanguage(body.locale)} plus itemIDs. Wardrobe: ${JSON.stringify(safe)} Context: ${JSON.stringify(body.context || {})} Learned signals: ${JSON.stringify(signals)}`, undefined, { userId: identity.userId, requestId: identity.requestId, operation: "outfit-recommendation" });

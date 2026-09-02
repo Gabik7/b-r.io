@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { createHmac } from "node:crypto";
-import { ApiError, authenticatedRequestIdentity, detectedImageMimeType, imageDataUrl, premiumEntitlementForUsage, rateLimitKey, requestClientIdentifier, requestIPAddress, requestIdentity, responseLanguage, revenueCatPremiumEntitlement, safeProviderURL, tryOnQuotaKey, usageQuotaKey } from "../src/apps/enselora/api";
+import { ApiError, authenticatedRequestIdentity, dailyOutfitGenerationLimit, detectedImageMimeType, imageDataUrl, premiumEntitlementForUsage, rateLimitKey, requestClientIdentifier, requestIPAddress, requestIdentity, responseLanguage, revenueCatPremiumEntitlement, safeProviderURL, tryOnQuotaKey, usageQuotaKey } from "../src/apps/enselora/api";
 import { constantTimeSecretMatch } from "../src/apps/enselora/app-attest";
 import { revenueCatEventUserId, webhookAuthorized } from "../src/apps/enselora/commerce";
 import { runtimeConfigStatus } from "../src/apps/enselora/config";
@@ -112,6 +112,11 @@ describe("ENSELORA API validation", () => {
 
     expect(revenueCatPremiumEntitlement(canonical)).toEqual({ expires_date: null });
     expect(revenueCatPremiumEntitlement(legacy)).toEqual({ expires_date: null });
+  });
+
+  test("keeps server outfit limits aligned with free and premium clients", () => {
+    expect(dailyOutfitGenerationLimit(false)).toBe(3);
+    expect(dailyOutfitGenerationLimit(true)).toBe(5);
   });
 
   test("maps supported app locales to model response languages", () => {

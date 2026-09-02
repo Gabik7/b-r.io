@@ -352,6 +352,10 @@ export async function premiumEntitlementForUsage(userId: string): Promise<boolea
   }
 }
 
+export function dailyOutfitGenerationLimit(isPremium: boolean): number {
+  return isPremium ? 5 : 3;
+}
+
 export async function requirePremium(
   userId: string,
   message = "Táto funkcia je dostupná s aktívnym ENSELORA+.",
