@@ -6,10 +6,51 @@ import { revenueCatEventUserId, webhookAuthorized } from "../src/apps/enselora/c
 import { runtimeConfigStatus } from "../src/apps/enselora/config";
 import { supabaseAdminHeaders } from "../src/apps/enselora/supabase-admin";
 import { adminAllowedIPs } from "../src/apps/enselora/security";
+import { modelGarmentIDs, modelGarmentPairings, modelWardrobe, resolveModelOutfits } from "../src/apps/enselora/outfit-selection";
 import { sanitizedGarmentPairings } from "../src/apps/enselora/styling-signals";
 import { tryOnGarmentRequirements } from "../src/apps/enselora/try-on";
 
 describe("ENSELORA API validation", () => {
+  test("uses short stable selection IDs for AI outfit requests", () => {
+    const firstID = "f427283f-b750-43de-86b8-4fe9bba94008";
+    const secondID = "dcb06ab0-42b6-4e48-9874-b3d82489b9f5";
+    const selection = modelWardrobe([
+      { id: firstID, name: "Tričko" },
+      { id: secondID, name: "Dlhá sukňa" },
+    ]);
+
+    expect(selection.items).toEqual([
+      { selectionID: "g1", name: "Tričko" },
+      { selectionID: "g2", name: "Dlhá sukňa" },
+    ]);
+    expect(JSON.stringify(selection.items)).not.toContain(firstID);
+    expect(modelGarmentIDs([secondID, "unknown"], selection.selectionIDByGarmentID)).toEqual(["g2"]);
+    expect(modelGarmentPairings([[firstID, secondID]], selection.selectionIDByGarmentID)).toEqual([["g1", "g2"]]);
+  });
+
+  test("resolves tolerant model selection IDs back to real garment UUIDs", () => {
+    const firstID = "f427283f-b750-43de-86b8-4fe9bba94008";
+    const secondID = "dcb06ab0-42b6-4e48-9874-b3d82489b9f5";
+    const selection = modelWardrobe([{ id: firstID }, { id: secondID }]);
+
+    expect(resolveModelOutfits([{ title: "Výlet", explanation: "Pohodlná voľba", itemIDs: [" G1 ", 2, "g999"] }], selection.garmentIDBySelectionID, 1)).toEqual([{
+      title: "Výlet",
+      explanation: "Pohodlná voľba",
+      itemIDs: [firstID, secondID],
+    }]);
+  });
+
+  test("rejects incomplete and duplicate AI outfit combinations", () => {
+    const selection = modelWardrobe([{ id: "shirt" }, { id: "skirt" }, { id: "shoes" }]);
+
+    expect(resolveModelOutfits([
+      { itemIDs: ["g1"] },
+      { title: "Prvý", itemIDs: ["g1", "g2"] },
+      { title: "Duplikát", itemIDs: ["g2", "g1"] },
+      { title: "Druhý", itemIDs: ["g1", "g3"] },
+    ], selection.garmentIDBySelectionID, 4).map((outfit) => outfit.title)).toEqual(["Prvý", "Druhý"]);
+  });
+
   test("keeps a long skirt authoritative over shorts in the person photo", () => {
     const requirements = tryOnGarmentRequirements([{
       name: "Dlhá ľanová sukňa",
