@@ -3,6 +3,10 @@ import nextMDX from '@next/mdx'
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
+  outputFileTracingRoot: process.cwd(),
+  turbopack: {
+    root: process.cwd(),
+  },
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'mdx'],
   outputFileTracingIncludes: {
     '/posts/*': ['./src/app/posts/**/*.{mdx,png,jpg,jpeg,webp,gif}'],
