@@ -64,6 +64,19 @@ describe("ENSELORA API validation", () => {
     expect(requirements.descriptors[0]?.length).toBe("long");
     expect(requirements.prompt).toContain("Fully replace any conflicting clothes");
     expect(requirements.prompt).toContain("never shorten it into shorts");
+    expect(requirements.prompt).toContain("must remain a skirt");
+  });
+
+  test("keeps dresses as one continuous garment instead of top and shorts", () => {
+    const requirements = tryOnGarmentRequirements([{
+      name: "Letné šaty",
+      category: "Šaty",
+      subcategory: "Šaty",
+      color: "Béžová",
+    }], 1);
+
+    expect(requirements.prompt).toContain("one continuous garment");
+    expect(requirements.prompt).toContain("Never split it into a top with shorts");
   });
 
   test("bounds Try-On garment metadata and ignores unsupported length values", () => {
