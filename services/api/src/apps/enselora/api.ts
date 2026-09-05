@@ -1,3 +1,4 @@
+import { premiumAccess } from "./entitlement";
 import { createHash } from "node:crypto";
 import { isIP } from "node:net";
 import { createClient } from "redis";
@@ -308,48 +309,40 @@ export function detectedImageMimeType(bytes: Uint8Array): "image/jpeg" | "image/
 type CachedEntitlement = { isPremium: boolean; expiresAt: number };
 const entitlementCache = new Map<string, CachedEntitlement>();
 
-export function revenueCatPremiumEntitlement(payload: any): any {
-  const entitlements = payload?.subscriber?.entitlements ?? {};
-  return entitlements.enselora_plus ?? entitlements["ENSELORA+"];
+export function revenueCatPremiumEntitlement(payload: unknown): Record<string, unknown> | undefined {
+  try { return premiumAccess(payload).entitlement; }
+  catch { throw new ApiError(502, "ENSELORA+ sa nepodarilo overiť."); }
 }
 
-export async function hasPremiumEntitlement(userId: string): Promise<boolean> {
+export async function hasPremiumEntitlement(userId: string, forceRefresh = false): Promise<boolean> {
   const cached = entitlementCache.get(userId);
-  if (cached && cached.expiresAt > Date.now()) return cached.isPremium;
-
+  if (!forceRefresh && cached && cached.expiresAt > Date.now()) return cached.isPremium;
+  // A webhook/audit must invalidate even a previous positive result on failure.
+  entitlementCache.delete(userId);
   const key = process.env.ENSELORA_REVENUECAT_SECRET_API_KEY;
   if (!key) throw new ApiError(503, "Overenie ENSELORA+ ešte nie je nakonfigurované.");
-  const response = await fetch(`https://api.revenuecat.com/v1/subscribers/${encodeURIComponent(userId)}`, {
-    headers: { Authorization: `Bearer ${key}`, Accept: "application/json" },
-    signal: AbortSignal.timeout(10_000),
-  });
-  if (response.status === 404) {
-    entitlementCache.set(userId, { isPremium: false, expiresAt: Date.now() + 60_000 });
-    return false;
-  }
-  if (!response.ok) throw new ApiError(502, "ENSELORA+ sa nepodarilo overiť.");
-  const payload = await response.json() as any;
-  const entitlement = revenueCatPremiumEntitlement(payload);
-  const expires = entitlement?.expires_date ? new Date(entitlement.expires_date).getTime() : Number.POSITIVE_INFINITY;
-  const isPremium = Boolean(entitlement) && expires > Date.now();
-  if (isPremium) {
-    entitlementCache.set(userId, {
-      isPremium: true,
-      expiresAt: Math.min(Date.now() + 5 * 60_000, expires),
+  let response: Response;
+  try {
+    response = await fetch(`https://api.revenuecat.com/v1/subscribers/${encodeURIComponent(userId)}`, {
+      headers: { Authorization: `Bearer ${key}`, Accept: "application/json" },
+      signal: AbortSignal.timeout(10_000),
     });
-  } else {
-    entitlementCache.set(userId, { isPremium: false, expiresAt: Date.now() + 60_000 });
-  }
-  return isPremium;
+  } catch { throw new ApiError(502, "ENSELORA+ sa nepodarilo overiť."); }
+  // Do not cache a negative result: a just-completed purchase must unlock immediately.
+  if (response.status === 404) return false;
+  if (!response.ok) throw new ApiError(502, "ENSELORA+ sa nepodarilo overiť.");
+  let access: ReturnType<typeof premiumAccess>;
+  try { access = premiumAccess(await response.json()); }
+  catch { throw new ApiError(502, "ENSELORA+ sa nepodarilo overiť."); }
+  if (!access.entitlement) return false;
+  if (entitlementCache.size >= 10_000) entitlementCache.clear();
+  entitlementCache.set(userId, { isPremium: true, expiresAt: Math.min(Date.now() + 60_000, access.expiresAt) });
+  return true;
 }
 
 export async function premiumEntitlementForUsage(userId: string): Promise<boolean> {
-  try {
-    return await hasPremiumEntitlement(userId);
-  } catch (error) {
-    if (error instanceof ApiError && [502, 503, 504].includes(error.status)) return false;
-    throw error;
-  }
+  // An upstream outage is not evidence that a paying customer has a free account.
+  return hasPremiumEntitlement(userId);
 }
 
 export function dailyOutfitGenerationLimit(isPremium: boolean): number {
@@ -421,16 +414,30 @@ export async function redisIsReady(): Promise<boolean> {
   }
 }
 
+// The reservation marker makes compensation safe to retry. Both the admission
+// check and increment happen in one Redis operation, without transient overdraw.
+async function reserveQuota(key: string, limit: number, ttl: number, message: string): Promise<{ key: string; remaining: number }> {
+  const marker = `enselora:reservation:${crypto.randomUUID()}`;
+  const result = Number(await redisEval(`
+    local used = tonumber(redis.call('GET', KEYS[1]) or '0')
+    if used >= tonumber(ARGV[1]) then return -1 end
+    local count = redis.call('INCR', KEYS[1])
+    redis.call('EXPIRE', KEYS[1], ARGV[2])
+    redis.call('SET', KEYS[2], KEYS[1], 'EX', ARGV[2])
+    return count
+  `, [key, marker], [limit, ttl]));
+  if (result === -1) throw new ApiError(429, message);
+  if (!Number.isInteger(result) || result < 1) throw new ApiError(503, "Kvótu sa nepodarilo overiť.");
+  return { key: marker, remaining: limit - result };
+}
+
 export async function reserveTryOn(userId: string): Promise<{ key: string; remaining: number }> {
-  const key = tryOnQuotaKey(userId);
-  const results = await redisPipeline([["INCR", key], ["EXPIRE", key, 2_764_800]]);
-  const count = Number(results?.[0]?.result);
-  if (!Number.isFinite(count)) throw new ApiError(503, "Kvótu sa nepodarilo overiť.");
-  if (count > 20) {
-    await redisPipeline([["DECR", key]]);
-    throw new ApiError(429, "Mesačný limit 20 Try-On náhľadov bol využitý.");
-  }
-  return { key, remaining: 20 - count };
+  return reserveQuota(tryOnQuotaKey(userId), 20, 2_764_800, "Mesačný limit 20 Try-On náhľadov bol využitý.");
+}
+
+export async function remainingTryOns(userId: string): Promise<number> {
+  const result = await redisPipeline([["GET", tryOnQuotaKey(userId)]]);
+  return Math.max(0, 20 - Number(result[0]?.result || 0));
 }
 
 export function tryOnQuotaKey(userId: string, date = new Date()): string {
@@ -438,7 +445,7 @@ export function tryOnQuotaKey(userId: string, date = new Date()): string {
 }
 
 export async function releaseTryOn(key: string): Promise<void> {
-  try { await redisPipeline([["DECR", key]]); } catch { /* preserve original provider error */ }
+  await releaseUsage(key);
 }
 
 export type QuotaPeriod = "day" | "month";
@@ -464,18 +471,20 @@ export async function reserveUsage(
 ): Promise<{ key: string; remaining: number }> {
   const key = usageQuotaKey(userId, scope, period);
   const ttl = period === "day" ? 172_800 : 2_764_800;
-  const results = await redisPipeline([["INCR", key], ["EXPIRE", key, ttl]]);
-  const count = Number(results?.[0]?.result);
-  if (!Number.isFinite(count)) throw new ApiError(503, "Kvótu sa nepodarilo overiť.");
-  if (count > limit) {
-    await redisPipeline([["DECR", key]]);
-    throw new ApiError(429, message);
-  }
-  return { key, remaining: limit - count };
+  return reserveQuota(key, limit, ttl, message);
 }
 
 export async function releaseUsage(key: string): Promise<void> {
-  try { await redisPipeline([["DECR", key]]); } catch { /* preserve original provider error */ }
+  try {
+    await redisEval(`
+      local quota = redis.call('GET', KEYS[1])
+      if not quota then return 0 end
+      redis.call('DEL', KEYS[1])
+      local used = tonumber(redis.call('GET', quota) or '0')
+      if used > 0 then return redis.call('DECR', quota) end
+      return 0
+    `, [key], []);
+  } catch { /* preserve original provider error; the marker permits safe retry */ }
 }
 
 export async function claimTryOnRequest(
@@ -499,7 +508,7 @@ export async function claimRemoteImageRequest(
   if (value === "active") {
     throw new ApiError(409, "Try-On sa ešte spracúva. Chvíľu počkaj a skús zobraziť výsledok znova.");
   }
-  const result = await redisPipeline([["SET", key, "active", "EX", 300, "NX"]]);
+  const result = await redisPipeline([["SET", key, "active", "EX", 900, "NX"]]);
   if (result?.[0]?.result !== "OK") {
     throw new ApiError(409, "Try-On sa ešte spracúva. Chvíľu počkaj a skús zobraziť výsledok znova.");
   }
@@ -538,7 +547,7 @@ export async function claimJSONRequest(
     } catch { /* an invalid cache value is treated as unavailable */ }
   }
   if (value === "active") throw new ApiError(409, "Požiadavka sa ešte spracúva. Skús to znova o chvíľu.");
-  const claimed = await redisPipeline([["SET", key, "active", "EX", 180, "NX"]]);
+  const claimed = await redisPipeline([["SET", key, "active", "EX", 600, "NX"]]);
   if (claimed?.[0]?.result !== "OK") {
     throw new ApiError(409, "Požiadavka sa ešte spracúva. Skús to znova o chvíľu.");
   }

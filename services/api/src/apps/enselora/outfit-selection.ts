@@ -79,3 +79,14 @@ export function resolveModelOutfits(
 
   return resolved;
 }
+
+// Keep roles aligned with iOS, including explicit user corrections.
+export function isCompleteOutfit(ids: string[], categories: Map<string, string>, avoided: string[][] = []): boolean {
+  const role = new Map(Object.entries({ tops: "top", bottoms: "bottom", dresses: "onePiece", one_piece: "onePiece", onePieces: "onePiece", shoes: "shoes", outerwear: "layer", bags: "accessory", accessories: "accessory" }));
+  const roles = ids.map((id) => role.get(categories.get(id) || "") || "excluded");
+  if (roles.includes("excluded") || new Set(roles).size !== roles.length || new Set(ids).size !== ids.length) return false;
+  if (avoided.some((pair) => pair.length >= 2 && pair.every((id) => ids.includes(id)))) return false;
+  const onePiece = roles.includes("onePiece");
+  if (onePiece && (roles.includes("top") || roles.includes("bottom"))) return false;
+  return onePiece || (roles.includes("top") && roles.includes("bottom"));
+}

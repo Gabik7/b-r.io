@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { ApiError, authenticatedRequestIdentity, claimTryOnRequest, completeTryOnRequest, enforceAIRequestLimits, enforceRateLimit, geminiJSON, handleApiError, imageDataUrl, json, parseJson, readRawBody, releaseTryOn, releaseTryOnRequest, remoteImageBase64, replicateRun, requirePremium, reserveTryOn } from "../../../apps/enselora/api";
+import { ApiError, authenticatedRequestIdentity, claimTryOnRequest, completeTryOnRequest, enforceAIRequestLimits, enforceRateLimit, geminiJSON, handleApiError, imageDataUrl, json, parseJson, readRawBody, releaseTryOn, releaseTryOnRequest, remoteImageBase64, remainingTryOns, replicateRun, requirePremium, reserveTryOn } from "../../../apps/enselora/api";
 import { verifyRequestAppAttest } from "../../../apps/enselora/app-attest";
 import { consumePurchasedTryOnCredit, refundPurchasedTryOnCredit } from "../../../apps/enselora/commerce";
 import { tryOnGarmentRequirements, type TryOnGarmentDescriptorInput } from "../../../apps/enselora/try-on";
@@ -22,7 +22,7 @@ export const POST: APIRoute = async ({ request }) => {
     await requirePremium(identity.userId, "Try-On je dostupný s aktívnym ENSELORA+.");
     const claim = await claimTryOnRequest(identity.userId, identity.requestId);
     if (claim.resultURL) {
-      return json({ imageBase64: await remoteImageBase64(claim.resultURL), replayed: true });
+      return json({ imageBase64: await remoteImageBase64(claim.resultURL), replayed: true, remaining: await remainingTryOns(identity.userId), usedPurchasedCredit: false });
     }
     idempotencyKey = claim.key;
     await enforceAIRequestLimits(request, "try-on");

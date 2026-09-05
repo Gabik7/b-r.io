@@ -185,8 +185,14 @@ describe("ENSELORA API validation", () => {
       .toBe("enselora:quota:analysis:month:2026-08:user-1");
   });
 
-  test("uses free limits when RevenueCat verification is unavailable", async () => {
-    expect(await premiumEntitlementForUsage("12345678-1234-1234-1234-123456789abc")).toBe(false);
+  test("does not downgrade a customer when RevenueCat verification is unavailable", async () => {
+    const previous = process.env.ENSELORA_REVENUECAT_SECRET_API_KEY;
+    delete process.env.ENSELORA_REVENUECAT_SECRET_API_KEY;
+    try { await expect(premiumEntitlementForUsage(crypto.randomUUID())).rejects.toMatchObject({ status: 503 }); }
+    finally {
+      if (previous === undefined) delete process.env.ENSELORA_REVENUECAT_SECRET_API_KEY;
+      else process.env.ENSELORA_REVENUECAT_SECRET_API_KEY = previous;
+    }
   });
 
   test("accepts canonical and legacy ENSELORA+ entitlement identifiers", () => {

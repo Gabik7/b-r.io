@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { Buffer } from "node:buffer";
-import { ApiError, revenueCatPremiumEntitlement } from "./api";
+import { ApiError, hasPremiumEntitlement } from "./api";
 import { supabaseAdmin } from "./supabase-admin";
 
 type RevenueCatEvent = {
@@ -49,18 +49,7 @@ export function webhookAuthorized(request: Request, rawBody: string): boolean {
 }
 
 async function revenueCatPremiumStatus(userId: string): Promise<boolean> {
-  const key = process.env.ENSELORA_REVENUECAT_SECRET_API_KEY || "";
-  if (!key) throw new ApiError(503, "RevenueCat server key ešte nie je nastavený.");
-  const response = await fetch(`https://api.revenuecat.com/v1/subscribers/${encodeURIComponent(userId)}`, {
-    headers: { Authorization: `Bearer ${key}`, Accept: "application/json" },
-    signal: AbortSignal.timeout(10_000),
-  });
-  if (response.status === 404) return false;
-  if (!response.ok) throw new ApiError(502, "RevenueCat audit sa nepodarilo dokončiť.");
-  const payload = await response.json() as any;
-  const entitlement = revenueCatPremiumEntitlement(payload);
-  const expiration = entitlement?.expires_date ? Date.parse(entitlement.expires_date) : Number.POSITIVE_INFINITY;
-  return Boolean(entitlement) && expiration > Date.now();
+  return hasPremiumEntitlement(userId, true);
 }
 
 function creditProducts(): Record<string, number> {
