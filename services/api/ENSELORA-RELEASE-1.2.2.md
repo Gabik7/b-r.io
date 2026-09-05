@@ -23,7 +23,7 @@ Never point this suite at a shared or production Redis. Let in-flight provider r
 This patch introduces no new environment variables, database migrations, RLS changes, product IDs or pricing changes. Keep the existing Redis counters and data; do not flush Redis. The iOS 1.2.2 (35) archive remains valid.
 
 1. Push the backend commit and deploy/rebuild the API using the existing VPS/Ploi workflow. A local Git commit alone does not update production. Drain in-flight AI requests before restarting workers.
-2. Deploy the prepared Supabase `refresh-entitlement` helper from the ENSELORA repository. Production was verified as v5 on 2026-09-05; the prepared v6 fixes subscription grace-period lookup. Deployment is still awaiting explicit approval after automatic approval review rejected the previous attempt. Retain JWT verification.
+2. Supabase `refresh-entitlement` **v6 was deployed on 2026-09-05 after explicit user approval**. It is ACTIVE with JWT verification enabled. Both deployed files match the tested source; an unauthenticated POST returns HTTP 401. The subscription grace-period fix is live; no further Supabase deployment or schema migration is needed for this patch.
 3. Before public release, verify an authorized App Store sandbox purchase, premium activation, restore and access on a second device. Paid AI/Try-On requires separate explicit authorization for the test. Credit-pack sales remain disabled until their delivery/refund flow is exercised.
 
 Existing App Store Connect/RevenueCat dashboard configuration was not changed by this patch. Health and mocked tests do not substitute for the purchase-to-feature-access verification.
